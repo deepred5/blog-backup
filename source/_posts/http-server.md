@@ -22,3 +22,9 @@ cd F:\myblog
 http-server -p 3000
 ```
 于是你就可以通过`http://localhost:3000/`访问`F:\myblog`了
+
+**注意一下**
+http-server开启的服务器默认会有缓存，这在开发时不是很友好，可以通过下面的命令关闭缓存
+```
+http-server -p 3000 -c-1
+```
