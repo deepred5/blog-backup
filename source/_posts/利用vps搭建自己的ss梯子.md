@@ -53,7 +53,7 @@ chmod +x shadowsocks-all.sh
 ./shadowsocks-all.sh 2>&1 | tee shadowsocks-all.log
 ```
 
-输入最后一个命令时，会让你选择ss客户端登陆时的端口号，密码，加密方式，其中加密方式选择 aes-256-cfb
+输入最后一个命令时，会让你选择下载哪种shadowsocks,这里我下载的是shadowsocks-go，同时会让你选择ss客户端登陆时的端口号，密码，加密方式，其中加密方式选择 aes-256-cfb
 
 安装成功后，终端应该会有这样的提示：
 ![ss-cofig](http://pic.deepred5.com/ss-3.png)
@@ -83,6 +83,54 @@ ss客户端代理模式开启的是pac模式，而该网站没有在pac匹配规
 
 解决方法是：先在线更新pac文件，然后再编辑pac文件，把该网站加入进去。
 或者你可以直接开启全局模式
+
+# 测试网速
+安装speedtest-cli
+```
+wget https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
+chmod +rx speedtest.py
+sudo mv speedtest.py /usr/local/bin/speedtest-cli
+sudo chown root:root /usr/local/bin/speedtest-cli
+```
+测试
+```
+speedtest-cli
+```
+![speed](http://pic.deepred5.com/speed2.png)
+
+# 多账号多端口配置
+有时我们想配置多个账号供不同人使用
+
+```
+vi /etc/shadowsocks-go/config.json
+```
+按下`i`进入insert模式，修改配置文件类似下面的形式:
+```
+{
+    "server":"0.0.0.0",
+    "local_port":1080,
+    "method":"aes-256-cfb",
+    "timeout":300,
+    "port_password": {
+        "8989": "密码1",
+        "8990": "秘密2"
+    }
+}
+```
+退出编辑，按下`ESC`，然后输入`:wq`,保存退出
+
+重启shadowsocks
+```
+/etc/init.d/shadowsocks-go restart
+```
+```
+使用命令：
+启动：/etc/init.d/shadowsocks-go start
+停止：/etc/init.d/shadowsocks-go stop
+重启：/etc/init.d/shadowsocks-go restart
+状态：/etc/init.d/shadowsocks-go status
+```
+
 # 参考
 [Bandwagon&Shadowsocks搭建个人VPN](http://fyerl.me/Bandwagon-Shadowsocks%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BAVPN.html)
 
