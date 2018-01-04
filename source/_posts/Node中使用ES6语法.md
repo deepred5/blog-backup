@@ -210,7 +210,7 @@ npm install koa --save
 新建一个文件夹`app`
 
 `util.js`
-```
+```javascript
 export function getMessage() {
     return new Promise((resolve, reject) => {
         resolve('Hello World!');
@@ -219,7 +219,7 @@ export function getMessage() {
 ```
 
 `app.js`
-```
+```javascript
 import Koa from 'koa';
 import { getMessage } from './util'
 const app = new Koa();
@@ -240,7 +240,7 @@ node app
 我们需要一个入口文件，来转码
 
 `index.js`
-```
+```javascript
 require("babel-register");
 require("./app.js");
 ```
