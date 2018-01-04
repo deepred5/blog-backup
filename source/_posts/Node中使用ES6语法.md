@@ -1,7 +1,7 @@
 ---
 title: Node中使用ES6语法
 date: 2018-01-04 14:55:21
-tags:
+tags: [babel]
 ---
 Node本身已经支持部分ES6语法，但是`import` `export`，以及`async` `await`(**Node 8 已经支持**)等一些语法，我们还是无法使用。为了能使用这些新特性，我们就需要使用babel把ES6转成ES5语法
 
