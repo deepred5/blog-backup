@@ -1,0 +1,236 @@
+1.nginx开启
+2.svn更新 
+前端和后台svn分别更新
+官网后端node server.js 
+官网前端 gulp server 
+3.微官网
+前端 npm run dev
+后端用官网的后端
+
+
+
+房供贷 110
+寿险贷 120
+公积金贷 130
+车供贷 160
+社保贷 190
+房产贷 210
+税金贷 230
+学信贷 240
+公务员贷 260
+
+
+
+01001   北京市
+73101   长沙市
+02801   成都市
+76901   东莞市
+75701   佛山市
+59101   福州市
+02001   广州市
+85101   贵阳市
+55101   合肥市
+79101   南昌市
+02501   南京市
+02101   上海市
+75501   深圳市
+31101   石家庄市
+02201   天津市
+02701   武汉市
+59201   厦门市
+37101   郑州市
+
+
+start nginx.exe
+
+nginx.exe -s stop
+
+taskkill /F /IM nginx.exe > nul 强制关闭
+
+
+yyfax1023
+yyfax3068
+yjs38881623
+
+官网后端：svn://172.30.3.171/Official/Console
+
+官网前端：svn://172.30.3.171/Official/Frontend
+
+
+WPT后端： svn://172.30.3.171/WPT/Console
+
+WPT前端： svn://172.30.3.171/WPT/Frontend
+
+
+官网微官网: svn://172.30.3.171/Official/Frontend_Mobile/branches/1.0.0
+官网小程序：svn://172.30.3.171/WPT/Mina/branches/1.0.0
+
+力合小贷后端: svn://172.30.3.171/FCG/branches/LMS/Console/1.0.0
+
+小幺鸡: http://172.30.3.61:8092/
+
+gitlab: http://172.30.3.67/dashboard/projects
+
+svn://172.30.3.171/SOUL, 学习平台的SVN空间。账号是邮箱前缀，密码是邮箱前缀+123， 如果要改密码，找秦锐改。
+
+
+rimraf
+
+rm -rf
+
+
+
+jira: http://172.29.3.241/secure/Dashboard.jspa
+
+上网认证：http://172.30.2.1/webAuth/index.htm
+
+周报: http://10.21.3.59:9000/yyfax/userInfo/login.jsp?targetUrl=http%3A%2F%2F10.21.3.59%3A9000%2Fyyfax%2F&winzoom=1
+
+a123456
+
+
+svn提交：
+
+不要把node_module下的文件提交  
+还有log文件  
+还有min文件
+node_modules 下如果自己新装了包，要传上去  
+
+svn密码：tiancong  
+
+
+
+微官网账户：
+15600000031  000000a
+15600000030  123456a
+15899999995
+  000000a 
+
+
+git@penguin.com:wuwxc/SOUL.git
+
+http://dev.yylending.com/server?action=sendTemplate&from=wechat
+
+服务号地址:
+https://mp.weixin.qq.com/cgi-bin/home?t=home/index&lang=zh_CN&token=690051754
+服务号zhengxyb@yonyou.com
+
+
+密码是Yyfax2017
+
+https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login
+
+
+userAth.push({uid: 374761916159744})
+open
+
+
+有数据的借款ID
+362334197012093116
+
+
+//没有还款记录
+362223196804040654
+
+//已结清
+
+440982199801011234
+
+
+
+//已结清，有逾期
+
+
+
+http://172.29.3.27/dashboard/projects
+
+
+http://172.29.3.27/Front-End
+
+
+官网账户：17700000001 a123456
+
+device 1765
+
+
+git:
+创建分支：git branch dev
+切换分支：git checkout dev
+删除本地分支：git branch -d dev
+删除远程分支：git push origin :dev
+
+git checkout -b [分支名] [远程名]/[分支名]
+git checkout -b branch origin/branch
+git checkout -t origin/release/v1.0.0-first
+
+合并分支：git checkout master
+git merge dev
+
+
+1. git diff  看下 你当前版本的修改代码 因为你有可能 有挡板什么的 忘记去除了
+
+2. 没用的修改 比如 加了 debugger 就git checkout 文件
+
+3. git add + git commit 
+
+4. git pull
+5. git status  查看冲突 有冲突就解决 没冲突可以push
+
+6. 有冲突 解决后 最好运行下项目
+
+7. 没问题就push
+
+git reset --hard HEAD^
+
+
+"program": "${workspaceRoot}\\server.js"
+
+https://github.com/JeremyWei/weixin_api
+
+
+https://github.com/node-webot/wechat
+
+
+//佳文
+440601196912260023
+
+
+有数据的借款ID
+362334197012093116
+
+
+
+//没有还款记录
+362223196804040654
+
+
+//已结清
+
+440982199801011234
+
+
+通知：上不了网的同事请先在网页上登陆下http://10.21.3.1/index.htm，进行上网系统认证，谢谢。
+
+
+python+casperjs+phantomjs +Tesseract-OCR+GraphicsMagick 
+
+
+360103199104044428    Tuxun646nitor.git
+git pull upstream master
+git push origin master
+git remote add upstream git@penguin.com:yyfax/yyfax-monitor.git
+git remote add upstream git@penguin.com:yytect/Ares.git
+git remote add upstream git@penguin.com:yytect/Ares.git
+
+redis-server.exe redis.windows.conf
+
+
+http://172.30.3.222   mt/mt1031MT 版本发布的ftp账号及密码
+
+
+git branch -a
+git remote
+git fetch upstream
+git checkout -b 1.0.0 upstream/1.0.0(如果有问题，可以先git fetch)
+git push origin
+git merge master --no-ff
