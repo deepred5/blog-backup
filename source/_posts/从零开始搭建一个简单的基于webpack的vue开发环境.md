@@ -7,7 +7,10 @@ tags: [webpack, vue]
 
 不过，为了学习和理解webpack解决了前端的哪些痛点，还是有必要从零开始自己搭建一个简单的开发环境。本文的webpack配置参考了vue-cli提供`webpack-simple `模板，这也是vue-cli里面最简单的一个webpack配置，非常适合从零开始学习。
 
-**注： 本文webpack基于3.10.0**
+**注： 本文webpack基于3.10.0 **
+
+###  [演示代码下载](https://github.com/deepred5/vue-webpack-simple) 
+
 <!-- more -->
 
 ## 安装webpack
@@ -129,3 +132,20 @@ npm run build
 ```
 可以看到生成了一个dist目录，里面就有打包好后的bundle.js
 ![](http://pic.deepred5.com/webpack2.png)
+
+webpack默认不支持转码es6，但是`import` `export`这两个语法却单独支持。所以我们可以改写前面的模块化写法
+
+util.js
+```javascript
+export default function say() {
+    console.log('hello world ');
+}
+```
+
+main.js
+```javascript
+import say from './util';
+
+say();
+
+```
