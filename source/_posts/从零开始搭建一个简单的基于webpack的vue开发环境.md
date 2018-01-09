@@ -149,3 +149,233 @@ import say from './util';
 say();
 
 ```
+
+## 引入vue
+下面我们来试着引入vue(目前不考虑单文件.vue)
+
+main.js
+```javascript
+import Vue from 'vue';
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    message: 'Hello Vue!'
+  }
+});
+
+```
+
+index.html
+```html
+<div id="app">
+    {{message}}
+</div>
+```
+还要注意一点：要修改webpack.config.js文件
+```javascript
+var path = require('path');
+var webpack = require('webpack');
+
+module.exports = {
+    entry: './src/main.js',
+    output: {
+        path: path.resolve(__dirname, './dist'),
+        publicPath: '/dist/',
+        filename: 'build.js'
+    },
+    devServer: {
+        historyApiFallback: true,
+        overlay: true
+    },
+    resolve: {
+        alias: {
+            'vue$': 'vue/dist/vue.esm.js'
+        }
+    }
+};
+```
+重新运行npm run dev，可以看到，页面正常显示了`Hello World`
+
+## 引入scss和css
+
+webpack默认只支持js的模块化，如果需要把其他文件也当成模块引入，就需要相对应的loader解析器
+```
+npm i node-sass css-loader vue-style-loader sass-loader --save-dev
+```
+webpack.config.js
+```javascript
+var path = require('path');
+var webpack = require('webpack');
+
+module.exports = {
+    entry: './src/main.js',
+    output: {
+        path: path.resolve(__dirname, './dist'),
+        publicPath: '/dist/',
+        filename: 'build.js'
+    },
+    devServer: {
+        historyApiFallback: true,
+        overlay: true
+    },
+    resolve: {
+        alias: {
+            'vue$': 'vue/dist/vue.esm.js'
+        }
+    },
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: [
+                    'vue-style-loader',
+                    'css-loader'
+                ],
+            }
+        ]
+    }
+};
+```
+解释：
+```javascript
+{
+    test: /\.css$/,
+    use: [
+        'vue-style-loader',
+        'css-loader'
+    ],
+}
+```
+这段代码意思是：匹配后缀名为css的文件,然后分别用css-loader，vue-style-loader去解析
+解析器的执行顺序是从下往上(先css-loader再vue-style-loader)
+
+注意：因为我们这里用vue开发，所以使用vue-style-loader，其他情况使用style-loader
+
+css-loader使得我们可以用模块化的写法引入css,vue-style-loader会将引入的css插入到html页面里的style标签里
+
+要引入scss也是同理的配置写法:
+```javascript
+module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: [
+                    'vue-style-loader',
+                    'css-loader'
+                ],
+            },
+            {
+                test: /\.scss$/,
+                use: [
+                    'vue-style-loader',
+                    'css-loader',
+                    'sass-loader'
+                ],
+            },
+            {
+                test: /\.sass$/,
+                use: [
+                    'vue-style-loader',
+                    'css-loader',
+                    'sass-loader?indentedSyntax'
+                ],
+            }]
+    }
+```
+
+我们现在来试下
+在src目录下新建style目录，style目录里新建common.scss
+```css
+body {
+    background: #fed;
+}
+```
+
+main.js
+```javascript
+import './style/common.scss';
+```
+发现css样式有用了
+
+## 使用babel转码
+ES6的语法大多数浏览器依旧不支持,bable可以把ES6转码成ES5语法，这样我们就可以大胆的在项目中使用最新特性了
+```
+npm i babel-core babel-loader babel-preset-env babel-preset-stage-3 --save-dev
+```
+在项目根目录新建一个.babelrc文件
+```javascript
+{
+  "presets": [
+    ["env", { "modules": false }],
+    "stage-3"
+  ]
+}
+
+```
+webpack.config.js添加一个loader
+```javascript
+{
+    test: /\.js$/,
+    loader: 'babel-loader',
+    exclude: /node_modules/
+}
+```
+exclude表示忽略node_modules文件夹下的文件，不用转码
+
+现在我们来试下async await语法吧
+util.js
+```javascript
+export default function getData() {
+    return new Promise((resolve, reject) => {
+        resolve('ok');
+    })
+}
+```
+
+main.js
+```javascript
+import getData from './util';
+import Vue from 'vue';
+
+import './style/common.scss';
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    message: 'Hello Vue!'
+  },
+  methods: {
+    async fetchData() {
+      const data = await getData();
+      this.message = data;
+    }
+  },
+  created() {
+    this.fetchData();
+  }
+});
+```
+这时控制台会报一个错误`regeneratorRuntime is not defined`，因为我们没有安装`babel-polyfill`
+```javascript
+npm i babel-polyfill --save-dev
+```
+然后修改webpack.config.js的入口
+```javascript
+entry: ['babel-polyfill', './src/main.js'],
+```
+重新npm run dev，可以发现正常运行了
+
+## 引入图片资源
+把图片也当成模块引入
+```
+npm i file-loader --save-dev
+```
+webpack.config.js添加一个loader
+```javascript
+{
+    test: /\.js$/,
+    loader: 'babel-loader',
+    exclude: /node_modules/
+}
+```
