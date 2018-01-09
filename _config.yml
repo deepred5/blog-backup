@@ -5,7 +5,7 @@
 # Site
 title: 深红结界
 subtitle: 前端, Mader
-description:
+description: 前端, Node
 author: 深红
 language: zh-Hans
 timezone:
@@ -75,3 +75,22 @@ deploy:
 
 
 avatar: /images/avatar.jpg
+
+jsonContent:
+    meta: false
+    pages: false
+    posts:
+      title: true
+      date: true
+      path: true
+      text: false
+      raw: false
+      content: false
+      slug: false
+      updated: false
+      comments: false
+      link: false
+      permalink: false
+      excerpt: false
+      categories: false
+      tags: true

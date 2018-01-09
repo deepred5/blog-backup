@@ -2,6 +2,7 @@
 title: 从零开始搭建一个简单的基于webpack的vue开发环境
 date: 2018-01-08 21:24:28
 tags: [webpack, vue]
+toc: true
 ---
 都8102年了，现在还来谈webpack的配置，额，是有点晚了。而且，基于vue-cli或者create-react-app生成的项目，也已经一键为我们配置好了webpack，看起来似乎并不需要我们深入了解。
 
@@ -114,8 +115,22 @@ module.exports = {
 注意：webpack-dev-server会自动启动一个静态资源web服务器 --hot参数表示启动热更新
 
 修改index.html，引入打包后的文件
-```
-<script src="/dist/build.js"></script>
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script src="/dist/build.js"></script>
+</body>
+
+</html>
 ```
 
 运行
@@ -168,9 +183,25 @@ var app = new Vue({
 
 index.html
 ```html
-<div id="app">
-    {{message}}
-</div>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        {{message}}
+    </div>
+    <script src="/dist/build.js"></script>
+    
+</body>
+
+</html>
 ```
 还要注意一点：要修改webpack.config.js文件
 ```javascript
@@ -374,8 +405,168 @@ npm i file-loader --save-dev
 webpack.config.js添加一个loader
 ```javascript
 {
-    test: /\.js$/,
-    loader: 'babel-loader',
-    exclude: /node_modules/
+    test: /\.(png|jpg|gif|svg)$/,
+    loader: 'file-loader',
+    options: {
+        name: '[name].[ext]?[hash]'
+    }
 }
+```
+
+在src目录下新建一个img目录，存放一张图片logo.png
+
+修改main.js
+```javascript
+import getData from './util';
+import Vue from 'vue';
+
+import './style/common.scss';
+
+
+Vue.component('my-component', {
+  template: '<img :src="url" />',
+  data() {
+    return {
+      url: require('./img/logo.png')
+    }
+  }
+})
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    message: 'Hello Vue !'
+  },
+  methods: {
+    async fetchData() {
+      const data = await getData();
+      this.message = data;
+    }
+  },
+  created() {
+    this.fetchData()
+  }
+});
+
+```
+
+修改index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        {{message}}
+        <my-component/>
+    </div>
+    <script src="/dist/build.js"></script>
+    
+</body>
+
+</html>
+
+```
+可以看见，图片也被正确加载了
+
+## 单文件组件
+在前面的例子里，我们使用 Vue.component 来定义全局组件
+在实际项目里，更推荐使用单文件组件
+```
+npm i vue-loader vue-template-compiler --save-dev
+```
+
+添加一个loader
+```javascript
+{
+    test: /\.vue$/,
+    loader: 'vue-loader',
+    options: {
+        loaders: {
+            'scss': [
+                'vue-style-loader',
+                'css-loader',
+                'sass-loader'
+            ],
+            'sass': [
+                'vue-style-loader',
+                'css-loader',
+                'sass-loader?indentedSyntax'
+            ]
+        }
+    }
+}
+```
+在src目录下新建一个App.vue
+```html
+<template>
+  <div id="app">
+    <h1>{{ msg }}</h1>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'app',
+  data () {
+    return {
+      msg: 'Welcome to Your Vue.js App2'
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+
+  h1 {
+    color: green;
+  }
+}
+
+</style>
+
+```
+
+main.js
+```javascript
+import Vue from 'vue';
+import App from './App.vue';
+
+import './style/common.scss';
+
+new Vue({
+  el: '#app',
+  template: '<App/>',
+  components: { App }
+})
+
+```
+
+index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script src="/dist/build.js"></script>
+</body>
+
+</html>
 ```
