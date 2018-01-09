@@ -17,7 +17,7 @@ tags: [Koa, Express]
 对于异步请求，两种框架的不同写法
 
 Koa2 (async + await)
-```
+```javascript
 const Koa = require('koa');
 const app = new Koa();
 const axios = require('axios');
@@ -40,7 +40,7 @@ console.log('[demo] start-quick is starting at port 9099');
 ```
 
 Express (经典回调 + Promise)
-```
+```javascript
 const express = require('express');
 const app = express();
 const axios = require('axios');
