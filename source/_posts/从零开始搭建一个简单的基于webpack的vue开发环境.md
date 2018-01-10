@@ -64,7 +64,7 @@ module.exports = {};
 目前整个项目的结构如下:
 ![](http://pic.deepred5.com/webpack-1.png)
 
-### js模块化
+## js模块化
 在ES6出现之前，js是没有统一的模块体系。
 服务器端使用CommonJS规范,而浏览器端又有AMD和CMD两种规范
 
