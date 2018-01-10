@@ -509,15 +509,29 @@ npm i vue-loader vue-template-compiler --save-dev
 <template>
   <div id="app">
     <h1>{{ msg }}</h1>
+    <img src="./img/logo.png">
+    <input type="text" v-model="msg">
   </div>
 </template>
 
 <script>
+
+import getData from './util';
+
 export default {
   name: 'app',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App2'
+      msg: 'Welcome to Your Vue.js'
+    }
+  },
+  created() {
+    this.fetchData();
+  },
+  methods: {
+     async fetchData() {
+      const data = await getData();
+      this.msg = data;
     }
   }
 }
@@ -525,13 +539,12 @@ export default {
 
 <style lang="scss">
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
 
   h1 {
     color: green;
   }
 }
-
 </style>
 
 ```
@@ -570,3 +583,85 @@ index.html
 
 </html>
 ```
+npm run build一下，可以发现dist目录下打包好了build.js和引入的图片资源
+
+## source-map
+在开发阶段，调试也是非常重要的一项需求。
+App.vue
+```javascript
+created() {
+    this.fetchData();
+    console.log('23333');
+}
+```
+我们故意打一个console，打开控制台
+![](http://pic.deepred5.com/webpack3.png)
+
+我们点击进入这个console的详细地址
+![](http://pic.deepred5.com/webpack5.png)
+
+进入的是打包后的build.js，我并不知道是在哪个组件里写的，这就造成了调试困难
+
+这时就要修改webpack.config.js
+```javascript
+module.exports = {
+    entry: ['babel-polyfill', './src/main.js'],
+    // 省略其他...
+
+    devtool: '#eval-source-map'
+};
+```
+重新npm run dev
+![](http://pic.deepred5.com/webpack4.png)
+这次调试，它直接返回那个组件的源代码了，这不是被打包过的！
+
+
+## 打包发布
+我们先试着npm run build打包一下文件
+![](http://pic.deepred5.com/webpack6.png)
+
+会发现，打包后的build.js非常大，有500多k了
+
+在实际发布时，会对文件进行压缩，缓存，分离等等优化处理
+
+```
+npm i cross-env --save-dev
+```
+
+修改package.json
+```javascript
+"scripts": {
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+}
+```
+这次我们设置了环境变量，打包时，NODE_ENV是production
+
+然后修改webpack.config.js，判断NODE_ENV为production时，压缩js代码
+```javascript
+var path = require('path');
+var webpack = require('webpack');
+
+module.exports = {
+    // 省略...
+}
+
+if (process.env.NODE_ENV === 'production') {
+    module.exports.devtool = '#source-map';
+    module.exports.plugins = (module.exports.plugins || []).concat([
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: '"production"'
+        }
+      }),
+      new webpack.optimize.UglifyJsPlugin(),
+    ])
+  }
+  
+```
+重新打包
+![](http://pic.deepred5.com/webpack7.png)
+
+可以看见，压缩效果非常明显！
+
+至此，一个非常简单的vue开发环境搭建成功。
