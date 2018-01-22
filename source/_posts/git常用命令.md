@@ -113,10 +113,12 @@ git pull upstream
 切换分支：git checkout dev
 删除本地分支：git branch -d dev
 删除远程分支：git push origin :dev
+查看项目所有分支: git branch -a
 
 查看提交信息: git log
 还原1.txt修改: git checkout 1.txt
 查看1.txt修改: git diff 1.txt
+
 
 把dev分支合并到当前分支: git merge dev
 ```
