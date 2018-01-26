@@ -146,7 +146,7 @@ say();
 ```
 babel demo -d dist
 ```
-新生成的dist文件夹下，就有转码后的文件。可以看见，转码后，仍然使用的是`module.exports`CMD模块加载
+新生成的dist文件夹下，就有转码后的文件。可以看见，转码后，仍然使用的是`module.exports` CommonJS模块加载
 
 ### babel-preset-env
 上面的转码其实有个缺陷，就是babel会默认把所有的代码转成es5，这意味着，即使node支持`let`关键字，转码后，也会被转成`var`
