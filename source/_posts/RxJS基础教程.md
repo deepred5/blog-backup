@@ -7,7 +7,7 @@ toc: true
 RxJS是一个基于可观测数据流在异步编程应用中的库。
 
 > ReactiveX is a combination of the best ideas from
-the **Observer pattern**, the **Iterator pattern**, and **functional programming**
+> the **Observer pattern**, the **Iterator pattern**, and **functional programming**
 
 正如官网所说，RxJS是基于观察者模式，迭代器模式和函数式编程。因此，首先要对这几个模式有所理解
 
@@ -142,7 +142,7 @@ Rx.Observable.fromEvent(document.querySelector('input[name=plus]'), 'click')
 以RxJS的写法，就是把按下加1当成一个数据流，把按下减1当成一个数据流，再通过merge把两个数据流合并，最后产生的数据流就是我们想要的计数器效果
 
 ## Observable Observer
-前面的例子，我们都在讨论`fromEvent`转换的Observable，其实还有很多种方法产生一个`Observable`，其中`create`也是最常见的方法。
+前面的例子，我们都在讨论`fromEvent`转换的Observable，其实还有很多种方法产生一个`Observable`，其中`create`也是一种常见的方法，可以用来创建自定义的Observable
 
 ```javascript
 var observable = Rx.Observable.create(function (observer) {
@@ -375,7 +375,7 @@ dispatch(fetchWeather('23333'));
 答案是在**Epic**进行异步操作
 
 >Epic是redux-observable的核心原语。
-它是一个函数，接收 actions 流作为参数并且返回 actions 流。 Actions 入, actions 出.
+>它是一个函数，接收 actions 流作为参数并且返回 actions 流。 Actions 入, actions 出.
 
 ```javascript
 export const FETCH_STARTED = 'WEATHER/FETCH_STARTED';
