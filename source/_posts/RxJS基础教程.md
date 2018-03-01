@@ -2,6 +2,7 @@
 title: RxJS基础教程
 date: 2018-02-28 16:29:17
 tags: [RxJS]
+toc: true
 ---
 RxJS是一个基于可观测数据流在异步编程应用中的库。
 
@@ -93,6 +94,12 @@ Rx.Observable.fromEvent(btn, 'click')
 **Observable**其实就是数据流**stream**
 **流**是在时间流逝的过程中产生的一系列事件。它具有时间与事件响应的概念。
 
+我们可以把一切输入都当做数据流来处理，比如说：
+* 用户操作
+* 网络响应
+* 定时器
+* Worker
+
 当产生了一个流后，我们可以通过操作符(Operator)对这个流进行一系列加工操作，然后产生一个新的流
 ```javascript
 Rx.Observable.fromEvent(window, 'click')
@@ -102,10 +109,37 @@ Rx.Observable.fromEvent(window, 'click')
     console.log(value)
   })
 ```
-`map`把流转换成了一个每次产生1的新流，然后`scan`类似`reduce`，最后也会产生一个新流，最后这个流被订阅。最终实现了:每次点击累加1的效果
+`map`把流转换成了一个每次产生1的新流，然后`scan`类似`reduce`，也会产生一个新流，最后这个流被订阅。最终实现了:每次点击累加1的效果
 
 可以用一个效果图来表示该过程：
 ![gif](https://blog.techbridge.cc/img/huli/rxjs/click_stream.gif)
+
+也可以对若干个数据流进行组合：
+
+例子：我们要实现下面这个效果：
+
+![gif](https://blog.techbridge.cc/img/huli/rxjs/counter_adv.gif)
+```javascript
+Rx.Observable.fromEvent(document.querySelector('input[name=plus]'), 'click')
+  .mapTo(1)
+  .merge(
+    Rx.Observable.fromEvent(document.querySelector('input[name=minus]'), 'click')
+      .mapTo(-1)
+  )
+  .scan((total, now) => total + now)
+  .subscribe(value => {
+    document.querySelector('#counter').innerText = value;
+  })
+```
+`merge`可以把两个数据流整个在一起，效果可以参考如下：
+
+![gif](https://blog.techbridge.cc/img/huli/rxjs/merge.png)
+
+刚才那个例子的数据流如下：
+
+![gif](https://blog.techbridge.cc/img/huli/rxjs/plus.gif)
+
+以RxJS的写法，就是把按下加1当成一个数据流，把按下减1当成一个数据流，再通过merge把两个数据流合并，最后产生的数据流就是我们想要的计数器效果
 
 ## Observable Observer
 前面的例子，我们都在讨论`fromEvent`转换的Observable，其实还有很多种方法产生一个`Observable`，其中`create`也是最常见的方法。
@@ -229,6 +263,9 @@ setTimeout(() => {
 ```
 
 ## Ajax异步操作
+```html
+<input type="text">
+```
 ```javascript
 function sendRequest(search) {
   return Rx.Observable.ajax.getJSON(`http://deepred5.com/cors.php?search=${search}`)
@@ -243,9 +280,10 @@ Rx.Observable.fromEvent(document.querySelector('input'), 'keyup')
   })
 
 ```
-现在每次在输入框输入，均会触发ajax请求。
+用户每次在input框每次进行输入，均会触发ajax请求，并且每个ajax返回的值都会被打印一遍
 
-如果我希望300ms以内停止输入，才发送请求(防抖)，并且返回的值只要最近的一个ajax返回的
+现在需要实现这样一个功能：
+希望用户在300ms以内停止输入，才发送请求(防抖)，并且console打印出来的值只要最近的一个ajax返回的
 
 ```javascript
 Rx.Observable.fromEvent(document.querySelector('input'), 'keyup')
@@ -324,7 +362,7 @@ export const fetchWeather = (cityCode) => {
 ```
 现在如果想要异步请求，只要:
 ```javascript
-// // fetchWeather是个异步action构造函数
+// fetchWeather是个异步action构造函数
 dispatch(fetchWeather('23333'));
 ```
 
@@ -360,7 +398,7 @@ export const fetchWeatherEpic = action$ =>
     .mergeMap(action =>
       ajax.getJSON(`/data/cityinfo/${action.cityCode}.html`)
         .map(response => fetchWeatherSuccess(response.weatherinfo))
-        // 这个action必须使用Observable.of方法转为一个observable
+        // 这个处理异常的action必须使用Observable.of方法转为一个observable
         .catch(error => Observable.of(fetchWeatherFailure(error)))
     );
 
@@ -369,7 +407,6 @@ export const fetchWeatherEpic = action$ =>
 现在如果想要异步请求，只要:
 ```javascript
 // fetchWeather只是个普通的action构造函数
-// fetchWeatherEpic会在reducer接受actiion前先做异步处理
 dispatch(fetchWeather('23333'));
 ```
 
@@ -378,12 +415,26 @@ dispatch(fetchWeather('23333'));
 * 不需要修改action构造函数，返回的仍然是普通对象
 * epics中间件会将action封装成Observable对象，可以使用RxJs的相应api来控制异步流程，它就像一个拥有许多高级功能的Promise，现在我们在Redux中也可以得到它的好处。
 
-## 最后
-本文只是简单的介绍了一下RxJS的基础知识以应用实例。
+## 总结
+原生JS传统解决异步的方式：callback、Generator、Promise、async/await
 
-更多高级操作请参考[官网](http://reactivex.io/rxjs/)
+RxJS解决的是数据流的问题，它可以让批量数据处理起来更方便
+
+可以想象的一些使用场景：
+* 多个服务端实时消息流，通过RxJS进行高阶处理，最后到 view 层就是很清晰的一个Observable，但是view层本身处理用户事件依然可以沿用原有的范式。
+
+* 爬虫抓取，每次对一个网站的前5页做平行请求，每个请求如果失败就重试，重试3次之后再放弃。
+
+可以看出，这种需要对流进行复杂操作的场景更加适合RxJS
+
+公司内部目前的大部分系统，前端就可能不太适合用RxJS，因为大部分是后台CRUD系统，整体性、实时性的要求都不高，并且也没有特别复杂的数据流操作
+
+我们推荐在适合RxJS的地方用RxJS，但是不强求RxJS for everything。RxJS给了我们另一种思考和解决问题的方式，但这不一定是必要的
+
 
 ## 参考
 [构建流式应用—RxJS详解](https://github.com/joeyguo/blog/issues/11)
 
 [希望是最淺顯易懂的RxJS教學](https://blog.techbridge.cc/2017/12/08/rxjs/?utm_medium=hao.caibaojian.com&utm_source=hao.caibaojian.com)
+
+[RxJS入门指引和初步应用](https://zhuanlan.zhihu.com/p/25383159)
