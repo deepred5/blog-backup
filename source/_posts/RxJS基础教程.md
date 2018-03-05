@@ -241,8 +241,69 @@ source: ------(123)--------(123)------------
 
 学完前面几个操作符，我们就可以写一个简单的实例了
 
+拖拽的原理是：
+* 监听拖拽元素的mousedown
+* 监听body的mousemove
+* 监听body的mouseup
 
+```html
+<style type="text/css">
+html, body {
+  height: 100%;
+  background-color: tomato;
+  position: relative;
+}
 
+#drag {
+  position: absolute;
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  background-color: #fff;
+  cursor: all-scroll;
+}
+</style>
+<div id="drag"></div>
+```
+```javascript
+const mouseDown = Rx.Observable.fromEvent(dragDOM, 'mousedown');
+const mouseUp = Rx.Observable.fromEvent(body, 'mouseup');
+const mouseMove = Rx.Observable.fromEvent(body, 'mousemove');
+```
+首先给出3个Observable，分别代表3种事件，我们希望mousedown的时候监听mousemove,然后mouseup时停止监听，于是RxJS可以这么写：
+
+```javascript
+const source = mouseDown
+.map(event => mouseMove.takeUntil(mouseUp))
+```
+
+`takeUntil`操作符可以在某个条件符合时，发送`complete`事件
+
+```
+source: -------e--------------e-----
+                \              \
+                  --m-m-m-m|     -m--m-m--m-m|
+```
+
+从图上可以看出，我们还需要把source扁平化，才能获取所需数据。
+
+完整代码：
+```javascript
+const dragDOM = document.getElementById('drag');
+const body = document.body;
+
+const mouseDown = Rx.Observable.fromEvent(dragDOM, 'mousedown');
+const mouseUp = Rx.Observable.fromEvent(body, 'mouseup');
+const mouseMove = Rx.Observable.fromEvent(body, 'mousemove');
+
+mouseDown
+    .flatMap(event => mouseMove.takeUntil(mouseUp))
+    .map(event => ({ x: event.clientX, y: event.clientY }))
+    .subscribe(pos => {
+        dragDOM.style.left = pos.x + 'px';
+        dragDOM.style.top = pos.y + 'px';
+    })
+```
 ## Observable Observer
 
 前面的例子，我们都在讨论`fromEvent`转换的Observable，其实还有很多种方法产生一个`Observable`，其中`create`也是一种常见的方法，可以用来创建自定义的Observable
@@ -538,3 +599,5 @@ RxJS解决的是数据流的问题，它可以让批量数据处理起来更方�
 [希望是最淺顯易懂的RxJS教學](https://blog.techbridge.cc/2017/12/08/rxjs/?utm_medium=hao.caibaojian.com&utm_source=hao.caibaojian.com)
 
 [RxJS入门指引和初步应用](https://zhuanlan.zhihu.com/p/25383159)
+
+[30天精通RxJS系列](https://ithelp.ithome.com.tw/users/20103367/ironman/1199)
