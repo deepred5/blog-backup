@@ -100,6 +100,8 @@ Rx.Observable.fromEvent(btn, 'click')
 * 定时器
 * Worker
 
+### 产生新流
+
 当产生了一个流后，我们可以通过操作符(Operator)对这个流进行一系列加工操作，然后产生一个新的流
 ```javascript
 Rx.Observable.fromEvent(window, 'click')
@@ -113,6 +115,8 @@ Rx.Observable.fromEvent(window, 'click')
 
 可以用一个效果图来表示该过程：
 ![gif](https://blog.techbridge.cc/img/huli/rxjs/click_stream.gif)
+
+### 合并流
 
 也可以对若干个数据流进行组合：
 
@@ -139,9 +143,108 @@ Rx.Observable.fromEvent(document.querySelector('input[name=plus]'), 'click')
 
 ![gif](https://blog.techbridge.cc/img/huli/rxjs/plus.gif)
 
-以RxJS的写法，就是把按下加1当成一个数据流，把按下减1当成一个数据流，再通过merge把两个数据流合并，最后产生的数据流就是我们想要的计数器效果
+以RxJS的写法，就是把按下加1当成一个数据流，把按下减1当成一个数据流，再通过merge把两个数据流合并，最后通过`scan`操作符，把新流上的数据累加，这就是我们想要的计数器效果
+
+
+
+### 扁平化流
+
+有时候，我们的Observable送出的是一个新的Observable:
+
+```javascript
+var click = Rx.Observable.fromEvent(document.body, 'click');
+var source = click.map(e => Rx.Observable.of(1, 2, 3));
+source.subscribe(value => {
+  console.log(value)
+});
+```
+
+这里，console打印出来的是对象，而不是我们想要的1,2,3，这是因为`map`返回的`Rx.Observable.of(1, 2, 3)`本身也是个Observable
+
+
+
+用图表示如下：
+
+```javascript
+click  : ------c------------c--------
+
+        map(e => Rx.Observable.of(1,2,3))
+
+source : ------o------------o--------
+                \            \
+                 (123)|       (123)|
+```
+
+
+
+因此，我们订阅到的value值就是一个Observable对象，而不是普通数据1，2，3
+
+我想要的其实不是Observable本身，而是属于这个Observable里面的那些东西，现在这个情形就是Observable里面又有Observable，有两层，可是我想要让它变成一层就好，该怎么办呢？
+
+这就需要把Observable扁平化
+
+```javascript
+const arr = [1, [2, 3], 4];
+
+// 扁平化后：
+const flatArr = [1, 2, 3, 4];
+
+```
+
+`concatAll`这个操作符就可以把Observable扁平化
+
+```javascript
+var click = Rx.Observable.fromEvent(document.body, 'click');
+var source = click.map(e => Rx.Observable.of(1, 2, 3));
+var example = source.concatAll();
+
+example.subscribe(value => {
+  console.log(value)
+})
+```
+
+```javascript
+click  : ------c------------c--------
+
+        map(e => Rx.Observable.of(1,2,3))
+
+source : ------o------------o--------
+                \            \
+                 (123)|       (123)|
+
+                   concatAll()
+
+example: ------(123)--------(123)------------
+```
+
+`flatMap`操作符也可以实现同样的作用，就是写法有些不同：
+
+```javascript
+var click = Rx.Observable.fromEvent(document.body, 'click');
+var source = click.flatMap(e => Rx.Observable.of(1, 2, 3));
+source.subscribe(value => {
+  console.log(value)
+})
+```
+
+```javascript
+click  : ------c------------c--------
+
+        flatMap(e => Rx.Observable.of(1,2,3))
+
+source: ------(123)--------(123)------------
+```
+
+
+
+### 简单拖拽实例
+
+学完前面几个操作符，我们就可以写一个简单的实例了
+
+
 
 ## Observable Observer
+
 前面的例子，我们都在讨论`fromEvent`转换的Observable，其实还有很多种方法产生一个`Observable`，其中`create`也是一种常见的方法，可以用来创建自定义的Observable
 
 ```javascript
