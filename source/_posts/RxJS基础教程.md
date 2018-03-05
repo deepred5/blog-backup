@@ -39,8 +39,8 @@ iter.next() // { value: undefined, done: true }
 
 ## 函数式编程
 
-流行的编程风格有：声明式编程和命令式编程
-函数式编程就是声明式编程
+提到函数式编程，就要提到声明式编程和命令式编程
+函数式编程是声明式编程的体现
 
 问题：将数组`[1, 2, 3]`的每个元素乘以2，然后计算总和。
 
@@ -278,7 +278,6 @@ Rx.Observable.fromEvent(document.querySelector('input'), 'keyup')
   .subscribe(value => {
     console.log(value)
   })
-
 ```
 用户每次在input框每次进行输入，均会触发ajax请求，并且每个ajax返回的值都会被打印一遍
 
@@ -293,7 +292,6 @@ Rx.Observable.fromEvent(document.querySelector('input'), 'keyup')
   .subscribe(value => {
     console.log(value)
   })
-
 ```
 `debounceTime`表示经过n毫秒后，没有流入新值，那么才将值转入下一个环节
 `switchMap`能取消上一个已无用的请求，只保留最后的请求结果流，这样就确保处理展示的是最后的搜索的结果
@@ -401,7 +399,6 @@ export const fetchWeatherEpic = action$ =>
         // 这个处理异常的action必须使用Observable.of方法转为一个observable
         .catch(error => Observable.of(fetchWeatherFailure(error)))
     );
-
 ```
 
 现在如果想要异步请求，只要:
