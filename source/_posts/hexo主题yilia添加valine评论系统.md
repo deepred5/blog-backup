@@ -1,7 +1,7 @@
 ---
-title: hexo添加valine评论系统
+title: hexo主题yilia添加valine评论系统
 date: 2018-04-05 11:59:51
-tags: [hexo]
+tags: [hexo, yilia]
 ---
 
 最近打算给博客添加评论功能，看了下市面上一些评论插件，觉得[gitment](https://github.com/imsun/gitment)和[Valine](https://github.com/xCss/Valine)这两款插件比较符合我的要求：轻量而且配置简单。
