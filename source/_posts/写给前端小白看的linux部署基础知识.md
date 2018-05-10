@@ -110,7 +110,7 @@ ftp界面，左边是我们本地目录，右边是服务器目录
 右边可视化界面，能很方便的查看服务器的各个文件夹，同时也可以把本地的文件上传到服务器(只需把文件拖拽到右边窗口即可)
 
 # node版本控制
-前端工程师经常要使用npm安装各种包，因此需要搭建node环境
+前端开发经常要使用npm安装各种包，因此需要搭建node环境
 使用`nvm`进行版本控制
 ```
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
