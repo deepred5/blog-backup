@@ -36,4 +36,4 @@ module.exports = {
 所以，怎么打包自己开发的JS库？
 
 ## webpack
-我第一个想到的就是用webpack打包，毕竟平时工作用React开发，最后项目打包就是用的它。
+我第一个想到的就是用webpack打包，毕竟工作经常用React开发，最后打包项目用的就是它。
