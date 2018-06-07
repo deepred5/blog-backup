@@ -158,7 +158,7 @@ export default {
 ```
 `monitor.js`并没有导出一个含有init方法的对象!
 
-我们期望的是`monitor.js`符合commonjs规范，但是我们在配置中并没有指出，所以webpack打包出来的文件，什么也没导出。
+我们希望的是`monitor.js`符合commonjs规范，但是我们在配置中并没有指出，所以webpack打包出来的文件，什么也没导出。
 
 我们平时开发中，打包时也不需要导出一个变量，只要打包的文件能在浏览器上立即执行即可。你随便翻一个Vue或React的项目，看看入口文件是咋写的?
 `main.js`
