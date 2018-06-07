@@ -134,7 +134,7 @@ module.exports = {
 ```
 `source-map`模式就不会使用`eval`关键字来方便debug,它会多生成一个`monitor.js.map`文件来方便debug
 
-再次`webpack`打包，然后倒入小程序，问题又来了：
+再次`webpack`打包，然后导入小程序，问题又来了：
 ```javascript
 var monitor = require('./dist/monitor.js');
 console.log(monitor); // {}
