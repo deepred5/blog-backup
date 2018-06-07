@@ -222,7 +222,7 @@ export default {
     }
 }
 ```
-现在，我们可以愉快的导入SDK
+现在，我们可以愉快的导入SDK了
 ```javascript
 var monitor = require('./dist/monitor.js').default;
 monitor.init('45454');
