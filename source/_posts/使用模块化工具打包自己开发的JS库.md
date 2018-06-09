@@ -4,7 +4,7 @@ date: 2018-06-06 16:57:22
 tags: [webpack, rollup]
 toc: true
 ---
-最近有个需求，需要为小程序写一个SDK，监控小程序的API调用和页面报错(类似[fundebug](https://docs.fundebug.com/notifier/wxjs/integration/))
+最近有个需求，需要为小程序写一个SDK，监控小程序的后台接口调用和页面报错(类似[fundebug](https://docs.fundebug.com/notifier/wxjs/integration/))
 
 听起来高大上的SDK，其实就是一个JS文件，类似平时开发中我们引入的第三方库:
 ```javascript
