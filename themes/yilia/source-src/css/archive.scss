@@ -153,3 +153,9 @@
 
   .vinfo {padding-left: 1rem;}
 }
+
+@media screen and (max-width: 800px) {
+  #comment {
+    margin: 0;
+  }
+}
