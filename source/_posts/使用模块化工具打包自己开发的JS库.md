@@ -115,7 +115,7 @@ var monitor = require('./dist/monitor.js');
 ![](http://pic.deepred5.com/lib-2.png)
 <img src="http://pic.deepred5.com/lib-5.jpg" width="160px"/>
 
-原因很简单：打包出来的`monitor.js`使用了`eval`关键字，而小程序内部并支持eval。
+原因很简单：打包出来的`monitor.js`使用了`eval`关键字，而小程序内部并不支持eval。
 
 我们只需要更改webpack配置的`devtool`即可
 ```javascript
