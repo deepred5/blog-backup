@@ -73,10 +73,10 @@ const ajax = $.ajax({
 这种要按顺序进行异步流程控制的场景，回调函数就显得捉襟见肘了。这时，Promise的异步解决方案就被提了出来。
 
 ## Promise
-当初我在学Promise时，看得我真是一脸懵逼，完全不明白这货到底怎么用。其实，Promise的api要分成两部分来理解：
+当初在学Promise时，看得我真是一脸懵逼，完全不明白这货到底怎么用。其实，Promise的api要分成两部分来理解：
 
-1. Promise构造函数：resolve reject
-2. Promise对象: then catch
+1. Promise构造函数：resolve reject (改变内部状态)
+2. Promise对象: then catch (流程控制)
 
 ## Promise对象
 Promise对象代表一个异步操作，有三种状态：pending（进行中）、fulfilled（已成功）和rejected（已失败）
