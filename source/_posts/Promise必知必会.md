@@ -351,6 +351,53 @@ p1.then(function(value) {
 });
 ```
 
+## 异常捕获
+理想状态下，Promise可以通过catch捕获到异常，但是如果我们没有使用catch，那么虽然控制台会打印错误，但是这次错误并不会终止脚本执行
+
+```html
+<script>
+const a = b.c.d;
+console.log(1); // 代码报错，不会运行到此处
+</script>
+<script>
+console.log(2); // 代码运行
+</script>
+```
+上述代码只会打印2
+
+```html
+<script>
+const promise = new Promise((resolve, reject) => {
+    const a = b.c.d;
+    resolve('ok');
+})
+promise.then(data => {
+    console.log(data)
+})
+console.log(1); // 代码报错，但是会运行到此处
+</script>
+<script>
+console.log(2); // 代码运行
+</script>
+```
+打印1和2
+
+解决方法：
+window有一个unhandledRejection事件，专门监听未捕获的reject错误
+```javascript
+window.onunhandledrejection = function(e) {
+    console.log(e.reason);
+}
+const promise = new Promise((resolve, reject) => {
+    const a = b.c.d;
+    resolve('ok');
+})
+promise.then(data => {
+    console.log(data)
+})
+```
+
 ## 参考
 * [ECMAScript 6 入门](http://es6.ruanyifeng.com/#docs/promise)
 * [JavaScript Promise迷你书](http://liubin.org/promises-book/)
+* [深入理解 JavaScript 异步](https://github.com/wangfupeng1988/js-async-tutorial)
