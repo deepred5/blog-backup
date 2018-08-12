@@ -56,6 +56,8 @@ function Duck(name, color) {
 }
 
 Duck.prototype = new Animal();
+// 也可以优化成这样，减少一次父级构造函数调用
+// Duck.prototype = Object.create(Animal.prototype);
 Duck.prototype.constructor = Duck;
 Duck.prototype.sayColor = function() {
     console.log(this.color);
