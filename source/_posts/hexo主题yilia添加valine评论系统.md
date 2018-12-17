@@ -49,3 +49,39 @@ new Valine({
 ```
 
 至此，魔改成功啦！
+
+PS: 如果你希望用户必须填写邮箱和昵称才能评论，由于valine并没有提供该功能，所以需要自己写段代码校验：
+
+```javascript
+<script>
+new Valine({
+    el: '#comment' ,
+    notify:false, 
+    verify:false, 
+    appId: '<%=theme.valine_appid%>',
+    appKey: '<%=theme.valine_appkey%>',
+    placeholder: 'ヾﾉ≧∀≦)o欢迎评论!',
+    path:window.location.pathname, 
+    avatar:'mm' 
+});
+
+document.body.addEventListener('click', function(e) {
+    if (e.target.classList.contains('vsubmit')) {
+        const email = document.querySelector('input[type=email]');
+        const nick = document.querySelector('input[name=nick]');
+        if (!email.value || !nick.value) {
+            const str = `<div class="valert txt-center"><div class="vtext">请填写昵称和邮箱！</div></div>`;
+            const vmark = document.querySelector('.vmark');
+            vmark.innerHTML = str;
+            vmark.style.display = 'block';
+
+            setTimeout(function() {
+                vmark.style.display = 'none';
+                vmark.innerHTML = '';
+            }, 2500);
+        }
+    }
+    });
+</script>
+
+```
