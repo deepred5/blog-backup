@@ -184,7 +184,7 @@ class Log extends Component {
     this.io.observe(this.ref.current);
   }
 
-  componentWillMount() {
+  componentWillUnmount() {
     this.io && this.io.disconnect();
   }
 
