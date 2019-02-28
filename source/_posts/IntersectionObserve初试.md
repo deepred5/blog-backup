@@ -191,6 +191,7 @@ class Log extends Component {
   render() {
     // 把log属性去掉，否则log属性也会渲染在div上 
     // <div log="[object Object]"></div>
+    
     const { log, ...props } = this.props;
     return (
       <div ref={this.ref} {...props}>
