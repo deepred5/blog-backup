@@ -93,7 +93,7 @@ callback函数被调用时，会传给它一个数组，这个数组里的每个
 * isIntersecting: 是否进入可视区域
 * intersectionRatio: 相交区域和目标元素的比例值，进入可视区域，值大于0，否则等于0
 
-### options
+## options
 调用IntersectionObserver时，除了传一个回调函数，还可以传入一个option对象，配置如下属性：
 
 * threshold: 决定了什么时候触发回调函数。它是一个数组，每个成员都是一个门槛值，默认为[0]，即交叉比例（intersectionRatio）达到0时触发回调函数。用户可以自定义这个数组。比如，[0, 0.25, 0.5, 0.75, 1]就表示当目标元素 0%、25%、50%、75%、100% 可见时，会触发回调函数。
@@ -112,7 +112,7 @@ const io = new IntersectionObserver((entries) => {
 });
 ```
 
-### 懒加载
+## 懒加载
 图片懒加载的原理就是：给img标签一个自定义属性，用来记录真正的图片地址。默认img标签只加载一个占位符。当图片进入可视区域时，再把img的src属性更换成真正的图片地址。
 ```html
 <div>
@@ -139,7 +139,7 @@ imgs.forEach((item) => {
 });
 ```
 
-### 打点上报
+## 打点上报
 前端页面经常有上报数据的需求，比如统计页面上的某些元素是否被用户查看，点击。这时，我们就可以封装一个`Log`组件，用于当元素进入可视区域时，就上报数据。
 以React为例，我们希望：被`Log`组件包裹的元素，进入可视区域后，就向后台发送`{ appid: 1234, type: 'news'}`数据
 ```javascript
@@ -202,3 +202,7 @@ class Log extends Component {
 
 export default Log
 ```
+
+## 兼容性
+safari并不支持该API，因此为了兼容主流浏览器，我们需要引入polyfill
+[intersection-observer](https://www.npmjs.com/package/intersection-observer)
