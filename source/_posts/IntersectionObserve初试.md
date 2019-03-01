@@ -30,7 +30,7 @@ tags: [js]
 ```
 上图代码中，`.box`元素目前并不在可视区域(viewport)内，如何监听它进入可视区域内？
 
-传统做法是：监听scroll方法，实时计算`.box`距离viewport的top值：
+传统做法是：监听scroll事件，实时计算`.box`距离viewport的top值：
 ```javascript
 const box = document.querySelector('.box');
 const viewHeight = document.documentElement.clientHeight;
@@ -43,7 +43,7 @@ window.addEventListener('scroll', () => {
   }
 });
 ```
-然而`scroll`方法会频繁触发，因此我们还需要手动节流。
+然而`scroll`事件会频繁触发，因此我们还需要手动节流。
 
 <!-- more -->
 
