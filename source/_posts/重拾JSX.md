@@ -24,7 +24,9 @@ class Home extends Component {
 }
 ```
 
-React的核心机制之一就是可以创建虚拟的DOM元素，利用虚拟DOM来减少对实际DOM的操作从而提升性能，JSX正是为了虚拟DOM而存在的语法糖。
+React的核心机制之一就是可以创建虚拟的DOM元素，利用虚拟DOM来减少对实际DOM的操作从而提升性能，JSX正是为了虚拟DOM而存在的语法糖
+
+<!-- more -->
 
 我们在平时的组件编写中，通常都这么写:
 ```javascript
