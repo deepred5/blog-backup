@@ -284,7 +284,7 @@ crontab -e
 ```
 输入
 ```bash
-15 5 * * * /usr/bin/certbot renew --quiet
+15 5 * * * certbot renew --quiet
 ```
 
 
