@@ -397,7 +397,7 @@ bot除了当用户输入命令时，我们做出相应的操作，我们也可�
 
 机器人bot
 
-<img src="https://i.loli.net/2019/03/31/5ca0d11ff3504.jpg" width="66" style="border-radius: 50%;">
+<img src="https://raw.githubusercontent.com/deepred5/yande-telegram-bot/master/bot.jpg" width="66" style="border-radius: 50%;">
 
 Telegram搜索`@yande5_bot`或者点击这里[yande5_bot](https://t.me/yande5_bot)
 
@@ -414,8 +414,8 @@ Telegram搜索`@yande5_bot`或者点击这里[yande5_bot](https://t.me/yande5_bo
 
 订阅channel
 
-<img src="https://i.loli.net/2019/03/31/5ca0d11fe83ac.jpg" width="66" style="border-radius: 50%;">
+<img src="https://raw.githubusercontent.com/deepred5/yande-telegram-bot/master/channel.jpg" width="66" style="border-radius: 50%;">
 
 Telegram搜索`@dailyYande`或者点击这里[dailyYande](https://t.me/dailyYande)
 
-使用`@yande5_bot`机器人管理`@dailyYande` channel，每晚20:00准时发送当日popular图片
+使用`@yande5_bot`机器人管理`@dailyYande` channel，每晚20:00准时发送当日popular图片，每周21:00准时发送本周popular图片
