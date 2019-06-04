@@ -12,6 +12,7 @@ toc: true
 4. wbbpack中[webpack-manifest-plugin](https://www.npmjs.com/package/webpack-manifest-plugin)插件打包出来的`manifest.json`文件，用来生成一份资源清单，为后端渲染服务
 
 下面我们来一一介绍下
+<!-- more -->
 
 #### html属性
 ```html
@@ -115,6 +116,218 @@ HTML5规范也废弃了这个属性，因此不建议使用
 ```
 通过一系列配置，就可以把一个PWA像APP一样，添加一个图标到手机屏幕上，点击图标即可打开站点
 
-#### DLL打包
+#### 基于webpack的react开发环境
+本文默认你已经了解最基本的webpack配置，如果完全不会，建议看下这篇[文章](http://anata.me/2018/01/08/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E5%9F%BA%E4%BA%8Ewebpack%E7%9A%84vue%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/)
 
+我们首先搭建一个最简单的基于webpack的react开发环境
+```bash
+mkdir learn-dll
+cd learn-dll
+```
+安装依赖
+```bash
+npm init -y
+npm install @babel/polyfill react react-dom --save
+```
+```
+npm install webpack webpack-cli webpack-dev-server @babel/core @babel/preset-env @babel/preset-react add-asset-html-webpack-plugin autoprefixer babel-loader clean-webpack-plugin css-loader html-webpack-plugin mini-css-extract-plugin node-sass postcss-loader sass-loader style-loader --save-dev
+```
+
+新建`.bablerc`
+```javascript
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "usage",
+        "corejs": 2,
+      }
+    ],
+    "@babel/preset-react"
+  ],
+  "plugins": []
+}
+```
+新建`postcss.config.js`
+```javascript
+module.exports = {
+  plugins: [
+    require('autoprefixer')
+  ]
+}
+```
+新建`webpack.dev.js`(基本配置不再详细介绍)
+```javascript
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  mode: 'development',
+  devtool: 'cheap-module-eval-source-map',
+  entry: {
+    main: './src/index.js'
+  },
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    filename: '[name].js',
+    chunkFilename: '[name].chunk.js',
+  },
+  devServer: {
+    historyApiFallback: true,
+    overlay: true,
+    port: 9001,
+    open: true,
+    hot: true,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: "babel-loader"
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader',
+          'css-loader',
+          'postcss-loader'
+        ],
+      },
+      {
+        test: /\.scss$/,
+        use: ['style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: false,
+              importLoaders: 2
+            }
+          },
+          'sass-loader',
+          'postcss-loader'
+        ],
+      },
+    ]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({ template: './src/index.html' }),
+  ]
+}
+```
+新建`src`目录，并新建`src/index.html`
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>learn dll</title>
+</head>
+<body>
+  <div id="app"></div>
+</body>
+</html>
+```
+新建`src/Home.js`
+```javascript
+import React from 'react';
+import './Home.scss';
+
+export default () => <div className="home">home</div>
+```
+新建`src/Home.scss`
+```css
+.home {
+  color: red;
+}
+```
+新建`src/index.js`
+```javascript
+import React, { Component } from 'react';
+import ReactDom from 'react-dom';
+import Home from './Home';
+
+class Demo extends Component {
+  render() {
+    return (
+      <Home />
+    )
+  }
+}
+
+ReactDom.render(<Demo/>, document.getElementById('app'));
+```
+修改`package.json`
+```bash
+"scripts": {
+  "dev": "webpack-dev-server --config webpack.dev.js"
+},
+```
+最后，运行`npm run dev`，应该可以看见效果
+
+新建`webpack.prod.js`
+```javascript
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+
+module.exports = {
+  mode: 'production',
+  entry: {
+    main: './src/index.js'
+  },
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    filename: '[name].[contenthash].js',
+    chunkFilename: '[name].[contenthash].chunk.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: "babel-loader"
+      },
+      {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader,
+          'css-loader',
+          'postcss-loader'
+        ],
+      },
+      {
+        test: /\.scss$/,
+        use: [MiniCssExtractPlugin.loader,
+        {
+          loader: 'css-loader',
+          options: {
+            modules: false,
+            importLoaders: 2
+          }
+        },
+          'sass-loader',
+          'postcss-loader'
+        ],
+      },
+    ]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({ template: './src/index.html' }),
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash].css',
+      chunkFilename: '[id].[contenthash].css',
+    }),
+    new CleanWebpackPlugin(),
+  ]
+};
+```
+修改`package.json`，添加一句`"build": "webpack --config webpack.prod.js"`
+
+运行`npm run build`，可以看见打包出来的`dist`目录
+
+至此，一个基于webpack的react环境搭建完成
 #### webpack-manifest-plugin
