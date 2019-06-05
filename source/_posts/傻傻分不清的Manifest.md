@@ -4,12 +4,12 @@ date: 2019-06-04 15:36:58
 tags: ['js', 'webpack', 'pwa']
 toc: true
 ---
-在前端，说到`manifest`，其实是很有歧义的，就我目前了解的情况来说，`manifest`可以指代下列含义：
+在前端，说到`manifest`，其实是有歧义的，就我了解的情况来说，`manifest`可以指代下列含义：
 
 1. `html`标签的`manifest`属性: [离线缓存](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Using_the_application_cache)（目前已被废弃）
 2. [PWA](https://developer.mozilla.org/zh-CN/docs/Web/Manifest): 将Web应用程序安装到设备的主屏幕
-3. webpack中[DLL](https://webpack.js.org/plugins/dll-plugin/#root)打包时,输出的`manifest.json`文件，用来分析已经打包过的文件，优化打包速度和大小
-4. wbbpack中[webpack-manifest-plugin](https://www.npmjs.com/package/webpack-manifest-plugin)插件打包出来的`manifest.json`文件，用来生成一份资源清单，为后端渲染服务
+3. wbbpack中[webpack-manifest-plugin](https://www.npmjs.com/package/webpack-manifest-plugin)插件打包出来的`manifest.json`文件，用来生成一份资源清单，为后端渲染服务 
+4. webpack中[DLL](https://webpack.js.org/plugins/dll-plugin/#root)打包时,输出的`manifest.json`文件，用来分析已经打包过的文件，优化打包速度和大小
 
 下面我们来一一介绍下
 <!-- more -->
@@ -120,6 +120,9 @@ HTML5规范也废弃了这个属性，因此不建议使用
 本文默认你已经了解最基本的webpack配置，如果完全不会，建议看下这篇[文章](http://anata.me/2018/01/08/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E5%9F%BA%E4%BA%8Ewebpack%E7%9A%84vue%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/)
 
 我们首先搭建一个最简单的基于webpack的react开发环境
+
+**源代码地址**：https://github.com/deepred5/learn-dll
+
 ```bash
 mkdir learn-dll
 cd learn-dll
@@ -140,11 +143,11 @@ npm install webpack webpack-cli webpack-dev-server @babel/core @babel/preset-env
     [
       "@babel/preset-env",
       {
-        "useBuiltIns": "usage",
+        "useBuiltIns": "usage", // 根据browserslis填写的浏览器，自动添加polyfill
         "corejs": 2,
       }
     ],
-    "@babel/preset-react"
+    "@babel/preset-react" // 编译react
   ],
   "plugins": []
 }
@@ -153,9 +156,16 @@ npm install webpack webpack-cli webpack-dev-server @babel/core @babel/preset-env
 ```javascript
 module.exports = {
   plugins: [
-    require('autoprefixer')
+    require('autoprefixer') // 根据browserslis填写的浏览器，自动添加css前缀
   ]
 }
+```
+新建`.browserslistrc`
+```
+last 10 versions
+ie >= 11
+ios >= 9
+android >= 6
 ```
 新建`webpack.dev.js`(基本配置不再详细介绍)
 ```javascript
@@ -211,7 +221,7 @@ module.exports = {
     ]
   },
   plugins: [
-    new HtmlWebpackPlugin({ template: './src/index.html' }),
+    new HtmlWebpackPlugin({ template: './src/index.html' }), // index打包模板
   ]
 }
 ```
@@ -282,8 +292,150 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, './dist'),
-    filename: '[name].[contenthash].js',
-    chunkFilename: '[name].[contenthash].chunk.js',
+    filename: '[name].[contenthash:8].js',
+    chunkFilename: '[name].[contenthash:8].chunk.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: "babel-loader"
+      },
+      {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, // 单独提取css文件
+          'css-loader',
+          'postcss-loader'
+        ],
+      },
+      {
+        test: /\.scss$/,
+        use: [MiniCssExtractPlugin.loader,
+        {
+          loader: 'css-loader',
+          options: {
+            modules: false,
+            importLoaders: 2
+          }
+        },
+          'sass-loader',
+          'postcss-loader'
+        ],
+      },
+    ]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({ template: './src/index.html' }),
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash:8].css',
+      chunkFilename: '[id].[contenthash:8].css',
+    }),
+    new CleanWebpackPlugin(), // 打包前先删除之前的dist目录
+  ]
+};
+```
+修改`package.json`，添加一句`"build": "webpack --config webpack.prod.js"`
+
+运行`npm run build`，可以看见打包出来的`dist`目录
+
+html,js,css都单独分离出来了
+
+![](http://pic.deepred5.com/m1.png)
+
+
+至此，一个基于webpack的react环境搭建完成
+
+#### webpack-manifest-plugin
+通常情况下，我们打包出来的js,css都是带上版本号的，通过`HtmlWebpackPlugin`可以自动帮我们在`index.html`里面加上带版本号的js和css
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>learn dll</title>
+<link href="main.198b3634.css" rel="stylesheet"></head>
+<body>
+  <div id="app"></div>
+<script type="text/javascript" src="main.d312f172.js"></script></body>
+</html>
+```
+但是在某些情况，`index.html`模板由后端渲染，那么我们就需要一份打包清单，知道打包后的文件对应的真正路径
+
+安装插件`webpack-manifest-plugin`
+
+`npm i webpack-manifest-plugin -D`
+
+修改`webpack.prod.js`
+```javascript
+const ManifestPlugin = require('webpack-manifest-plugin');
+module.exports = {
+    // ...
+    plugins: [
+      new ManifestPlugin()
+    ]
+};
+```
+重新打包，可以看见`dist`目录新生成了一个`manifest.json`
+```javascript
+{
+  "main.css": "main.198b3634.css",
+  "main.js": "main.d312f172.js",
+  "index.html": "index.html"
+}
+```
+比如在SSR开发时，前端打包后，node后端就可以通过这个json数据，返回正确资源路径的html模板
+```javascript
+const buildPath = require('./dist/manifest.json');
+
+res.send(`
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>ssr</title>
+<link href="${buildPath['main.css']}" rel="stylesheet"></head>
+<body>
+  <div id="app"></div>
+<script type="text/javascript" src="${buildPath['main.js']}"></script></body>
+</html>
+`);
+```
+
+#### 代码分割
+我们之前的打包方式，有一个缺点，就是把业务代码和库代码都统统打到了一个`main.js`里面。每次业务代码改动后，`main.js`的hash值就变了，导致客户端又要重新下载一遍`main.js`，但是里面的库代码其实是没改变的！
+
+通常情况下，`react` `react-dom`之类的库，都是不经常改动的。我们希望单独把这些库代码提取出来，生成一个`vendor.js`，这样每次改动代码，只是下载`main.js`，`vendor.js`可以充分缓存(也就是所谓的代码分割code splitting)
+
+webpack4自带[代码分割](https://webpack.js.org/guides/code-splitting/)功能，只要配置:
+```javascript
+optimization: {
+  splitChunks: {
+    chunks: 'all'
+  }
+}
+```
+`webpack.prod.js`
+```javascript
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
+
+module.exports = {
+  mode: 'production',
+  entry: {
+    main: './src/index.js'
+  },
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    filename: '[name].[contenthash:8].js',
+    chunkFilename: '[name].[contenthash:8].chunk.js',
   },
   module: {
     rules: [
@@ -318,16 +470,248 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({ template: './src/index.html' }),
     new MiniCssExtractPlugin({
-      filename: '[name].[contenthash].css',
-      chunkFilename: '[id].[contenthash].css',
+      filename: '[name].[contenthash:8].css',
+      chunkFilename: '[id].[contenthash:8].css',
     }),
     new CleanWebpackPlugin(),
-  ]
+    new ManifestPlugin()
+  ],
+  optimization: {
+    splitChunks: {
+      chunks: 'all'
+    }
+  }
 };
 ```
-修改`package.json`，添加一句`"build": "webpack --config webpack.prod.js"`
+重新打包，发现新生成了一个`vendor.js`文件，公用的一些代码就被打包进去了
 
-运行`npm run build`，可以看见打包出来的`dist`目录
+![](http://pic.deepred5.com/m2.png)
 
-至此，一个基于webpack的react环境搭建完成
-#### webpack-manifest-plugin
+重新修改`src/Home.js`,然后打包，你会发现`vendor.js`的hash没有改变，这也是我们希望的
+
+#### DLL打包
+上面的打包方式，随着项目的复杂度上升后，打包速度会开始变慢。原因是，每次打包，webpack都要分析哪些是公用库，然后把他打包到`vendor.js`里
+
+我们可不可以在第一次构建`vendor.js`以后，下次打包，就直接跳过那些被打包到`vendor.js`里的代码呢？这样打包速度可以明显提升
+
+这就需要`DllPlugin`结合`DllRefrencePlugin`插件的运用
+
+dll打包原理就是：
+1. 把指定的库代码打包到一个`dll.js`,同时生成一份对应的`manifest.json`文件
+2. webpack打包时，读取`manifest.json`,知道哪些代码可以直接忽略，从而提高构建速度
+
+我们新建一个`webpack.dll.js`
+```javascript
+const path = require('path');
+const webpack = require('webpack');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+module.exports = {
+  mode: 'production',
+  entry: {
+    vendors: ['react', 'react-dom'] // 手动指定打包哪些库
+  },
+  output: {
+    filename: '[name].[hash:8].dll.js',
+    path: path.resolve(__dirname, './dll'),
+    library: '[name]'
+  },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new webpack.DllPlugin({
+      path: path.join(__dirname, './dll/[name].manifest.json'), // 生成对应的manifest.json，给webpack打包用
+      name: '[name]',
+    }),
+  ],
+}
+
+```
+添加一条命令:
+
+`"build:dll": "webpack --config webpack.dll.js"`
+
+运行dll打包
+
+`npm run build:dll`
+
+发现生成一个`dll`目录
+
+![](http://pic.deepred5.com/m3.png)
+
+修改`webpack.prod.js`
+```javascript
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
+const webpack = require('webpack');
+
+module.exports = {
+  mode: 'production',
+  entry: {
+    main: './src/index.js'
+  },
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    filename: '[name].[contenthash:8].js',
+    chunkFilename: '[name].[contenthash:8].chunk.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: "babel-loader"
+      },
+      {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader,
+          'css-loader',
+          'postcss-loader'
+        ],
+      },
+      {
+        test: /\.scss$/,
+        use: [MiniCssExtractPlugin.loader,
+        {
+          loader: 'css-loader',
+          options: {
+            modules: false,
+            importLoaders: 2
+          }
+        },
+          'sass-loader',
+          'postcss-loader'
+        ],
+      },
+    ]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({ template: './src/index.html' }),
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash:8].css',
+      chunkFilename: '[id].[contenthash:8].css',
+    }),
+    new webpack.DllReferencePlugin({
+      manifest: path.resolve(__dirname, './dll/vendors.manifest.json') // 读取dll打包后的manifest.json，分析哪些代码跳过
+    }),
+    new CleanWebpackPlugin(),
+    new ManifestPlugin()
+  ],
+  optimization: {
+    splitChunks: {
+      chunks: 'all'
+    }
+  }
+};
+```
+重新`npm run build`，发现`dist`目录里，`vendor.js`没有了
+
+这是因为`react`,`react-dom`已经打包到`dll.js`里了，`webpack`读取`manifest.json`之后，知道可以忽略这些代码，于是就没有再打包了
+
+但这里还有个问题，打包后的`index.html`还需要添加`dll.js`文件，这就需要`add-asset-html-webpack-plugin`插件
+
+`npm i add-asset-html-webpack-plugin -D`
+
+修改`webpack.prod.js`
+
+```javascript
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
+const webpack = require('webpack');
+const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
+
+module.exports = {
+  mode: 'production',
+  entry: {
+    main: './src/index.js'
+  },
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    filename: '[name].[contenthash:8].js',
+    chunkFilename: '[name].[contenthash:8].chunk.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: "babel-loader"
+      },
+      {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader,
+          'css-loader',
+          'postcss-loader'
+        ],
+      },
+      {
+        test: /\.scss$/,
+        use: [MiniCssExtractPlugin.loader,
+        {
+          loader: 'css-loader',
+          options: {
+            modules: false,
+            importLoaders: 2
+          }
+        },
+          'sass-loader',
+          'postcss-loader'
+        ],
+      },
+    ]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({ template: './src/index.html' }),
+    new AddAssetHtmlPlugin({ filepath: path.resolve(__dirname, './dll/*.dll.js') }), // 把dll.js加进index.html里，并且拷贝文件到dist目录
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash:8].css',
+      chunkFilename: '[id].[contenthash:8].css',
+    }),
+    new webpack.DllReferencePlugin({
+      manifest: path.resolve(__dirname, './dll/vendors.manifest.json') // 读取dll打包后的manifest.json，分析哪些代码跳过
+    }),
+    new CleanWebpackPlugin(),
+    new ManifestPlugin()
+  ],
+  optimization: {
+    splitChunks: {
+      chunks: 'all'
+    }
+  }
+};
+
+```
+重新`npm run build`，可以看见`dll.js`也被打包进`dist`目录了，同时`index.html`也正确引用
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>learn dll</title>
+<link href="main.198b3634.css" rel="stylesheet"></head>
+<body>
+  <div id="app"></div>
+<script type="text/javascript" src="vendors.8ec3d1ea.dll.js"></script><script type="text/javascript" src="main.0bc9c924.js"></script></body>
+</html>
+```
+
+![](http://pic.deepred5.com/m4.png)
+
+#### 小结
+
+我们介绍了4种`manifest`相关的前端技术。`manifest`的英文含义是**名单**, 4种技术的确都是把`manifest`当做清单使用：
+1. 缓存清单
+2. PWA清单
+3. 打包资源路径清单
+4. dll打包清单
+
+只不过是在不同的场景中使用特定的清单来完成某些功能
+
+所以，学好英文是多么重要，这样才不会傻傻分不清`manifest`到底是干啥的！
