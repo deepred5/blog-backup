@@ -286,6 +286,10 @@ crontab -e
 ```bash
 15 5 * * * certbot renew --quiet
 ```
+强制更新证书
+```bash
+certbot renew --force-renew
+```
 
 
 ### nginx配置webhook
