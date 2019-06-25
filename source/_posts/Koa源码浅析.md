@@ -341,6 +341,7 @@ class Application {
     ctx.response = Object.create(this.response);
     ctx.req = ctx.request.req = req;
     ctx.res = ctx.response.res = res;
+    ctx.app = ctx.request.app = ctx.response.app = this;
     return ctx;
   }
 
@@ -415,7 +416,7 @@ function compose(funcs) {
 Koa的中间件机制类似上面的`compose`，同样是把多个函数包装成一个，但是koa的中间件类似洋葱模型，也就是从A中间件执行到B中间件，B中间件执行完成以后，仍然可以再次回到A中间件。
 ![](https://raw.githubusercontent.com/fengmk2/koa-guide/master/onion.png)
 
-Koa使用了`koa-compose`实现了中间件机制，源码非常精简，但是有的难懂。
+Koa使用了`koa-compose`实现了中间件机制，源码非常精简，但是有点难懂。
 ```javascript
 
 function compose (middleware) {
@@ -638,7 +639,7 @@ app.listen(3001, () => {
   console.log('server start at 3001');
 });
 ```
-现在我们已经实现了中间件的错误异常捕获，但是我们还缺少框架层发生错误的捕获机制。我们可以让`Application`继承原生的`EventEmitter`，从而实现`error`监听
+现在我们已经实现了中间件的错误异常捕获，但是我们还缺少框架层发生错误的捕获机制。我们可以让`Application`继承原生的`Emitter`，从而实现`error`监听
 
 `kao/application.js`
 ```javascript
