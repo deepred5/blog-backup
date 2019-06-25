@@ -263,6 +263,8 @@ const proto = module.exports = {
   },
 }
 
+// delegates NPM包 原理就是__defineGetter__和__defineSetter__
+
 // method是委托方法，getter委托getter,access委托getter和setter。
 
 // proto.status => proto.response.status
@@ -278,6 +280,23 @@ delegate(proto, 'request')
 ```
 `context.js`代理了`request`和`response`。`ctx.body`指向`ctx.response.body`。但是此时`ctx.response` `ctx.request`还没注入！
 
+可能会有疑问，为什么`response.js`和`request.js`使用`get set`代理，而`context.js`使用`delegate`代理? 原因主要是: `set`和`get`方法里面还可以加入一些自己的逻辑处理。而`delegate`就比较纯粹了，只代理属性。
+```javascript
+{
+  get length() {
+    // 自己的逻辑
+    const len = this.get('Content-Length');
+    if (len == '') return;
+    return ~~len;
+  },
+}
+
+// 仅仅代理属性
+delegate(proto, 'response')
+  .access('length')
+```
+因此`context.js`比较适合使用`delegate`代理。
+
 真正注入原生对象，是在`application.js`里注入的！！！
 ```javascript
 const http = require('http');
@@ -288,6 +307,7 @@ const response = require('./response');
 class Application {
   constructor() {
     this.callbackFn = null;
+    // 每个Kao实例的context request respones
     this.context = Object.create(context);
     this.request = Object.create(request);
     this.response = Object.create(response);
@@ -308,7 +328,216 @@ class Application {
 
   handleRequest(ctx) {
     const handleResponse = () => respond(ctx);
+    // callbackFn是个async函数，最后返回promise对象
     return this.callbackFn(ctx).then(handleResponse);
+  }
+
+  createContext(req, res) {
+    // 针对每个请求，都要创建ctx对象
+    // 每个请求的ctx request response
+    // ctx代理原生的req res就是在这里代理的
+    let ctx = Object.create(this.context);
+    ctx.request = Object.create(this.request);
+    ctx.response = Object.create(this.response);
+    ctx.req = ctx.request.req = req;
+    ctx.res = ctx.response.res = res;
+    return ctx;
+  }
+
+  listen(...args) {
+    const server = http.createServer(this.callback());
+    return server.listen(...args);
+  }
+}
+
+module.exports = Application;
+
+function respond(ctx) {
+  // 根据ctx.body的类型，返回最后的数据
+  /* 可能的类型，代码删减了部分判断
+  1. string
+  2. Buffer
+  3. Stream
+  4. Object
+  */
+  let content = ctx.body;
+  if (typeof content === 'string') {
+    ctx.res.end(content);
+  }
+  else if (typeof content === 'object') {
+    ctx.res.end(JSON.stringify(content));
+  }
+}
+```
+代码中使用了`Object.create`的方法创建一个全新的对象，通过原型链继承原来的属性。这样可以有效的防止污染原来的对象。
+
+`createContext`在每次http请求时都会调用，每次调用都新生成一个`ctx`对象，并且代理了这次http请求的原生的对象。
+
+`respond`才是最后返回http响应的方法。根据执行完所有中间件后`ctx.body`的类型，调用`res.end`结束此次http请求。
+
+### 中间件机制
+```javascript
+const greeting = (firstName, lastName) => firstName + ' ' + lastName
+const toUpper = str => str.toUpperCase()
+
+const fn = compose([toUpper, greeting]);
+
+const result = fn('jack', 'smith');
+
+console.log(result);
+```
+函数式编程有个`compose`的概念。比如把`greeting`和`toUpper`组合成一个复合函数。调用这个复合函数，会先调用`greeting`，然后把返回值传给`toUpper`继续执行。
+
+实现方式:
+```javascript
+// 命令式编程（面向过程）
+function compose(fns) {
+  let length = fns.length;
+  let count = length - 1;
+  let result = null;
+
+  return function fn1(...args) {
+    result = fns[count].apply(null, args);
+    if (count <= 0) {
+      return result
+    }
+
+    count--;
+    return fn1(result);
+  }
+}
+
+// 声明式编程(函数式)
+function compose(funcs) {
+  return funcs.reduce((a, b) => (...args) => a(b(...args)))
+}
+```
+Koa的中间件机制类似上面的`compose`，同样是把多个函数包装成一个，但是koa的中间件类似洋葱模型，也就是从A中间件执行到B中间件，B中间件执行完成以后，仍然可以再次回到A中间件。
+![](https://raw.githubusercontent.com/fengmk2/koa-guide/master/onion.png)
+
+Koa使用了`koa-compose`实现了中间件机制，源码非常精简，但是有的难懂。
+```javascript
+
+function compose (middleware) {
+  if (!Array.isArray(middleware)) throw new TypeError('Middleware stack must be an array!')
+  for (const fn of middleware) {
+    if (typeof fn !== 'function') throw new TypeError('Middleware must be composed of functions!')
+  }
+
+  /**
+   * @param {Object} context
+   * @return {Promise}
+   * @api public
+   */
+
+  return function (context, next) {
+    // last called middleware #
+    let index = -1
+    return dispatch(0)
+    function dispatch (i) {
+      if (i <= index) return Promise.reject(new Error('next() called multiple times'))
+      index = i
+      let fn = middleware[i]
+      if (i === middleware.length) fn = next
+      if (!fn) return Promise.resolve()
+      try {
+        return Promise.resolve(fn(context, dispatch.bind(null, i + 1)));
+      } catch (err) {
+        return Promise.reject(err)
+      }
+    }
+  }
+}
+```
+```javascript
+const context = {};
+
+const sleep = (time) => new Promise(resolve => setTimeout(resolve, time));
+
+const test1 = async (context, next) => {
+  console.log('1-start');
+  context.age = 11;
+  await next();
+  console.log('1-end');
+};
+
+const test2 = async (context, next) => {
+  console.log('2-start');
+  context.name = 'deepred';
+  await sleep(2000);
+  console.log('2-end');
+};
+
+const fn = compose([test1, test2]);
+
+fn(context).then(() => {
+  console.log('end');
+  console.log(context);
+});
+```
+弄懂了中间件机制，我们修改`kao/application.js`
+
+```javascript
+class Application {
+  constructor() {
+    this.middleware = []; // 存储中间件
+    this.context = Object.create(context);
+    this.request = Object.create(request);
+    this.response = Object.create(response);
+  }
+
+  use(fn) {
+    this.middleware.push(fn); // 存储中间件
+  }
+
+  compose (middleware) {
+    if (!Array.isArray(middleware)) throw new TypeError('Middleware stack must be an array!')
+    for (const fn of middleware) {
+      if (typeof fn !== 'function') throw new TypeError('Middleware must be composed of functions!')
+    }
+  
+    /**
+     * @param {Object} context
+     * @return {Promise}
+     * @api public
+     */
+  
+    return function (context, next) {
+      // last called middleware #
+      let index = -1
+      return dispatch(0)
+      function dispatch (i) {
+        if (i <= index) return Promise.reject(new Error('next() called multiple times'))
+        index = i
+        let fn = middleware[i]
+        if (i === middleware.length) fn = next
+        if (!fn) return Promise.resolve()
+        try {
+          return Promise.resolve(fn(context, dispatch.bind(null, i + 1)));
+        } catch (err) {
+          return Promise.reject(err)
+        }
+      }
+    }
+  }
+  
+
+  callback() {
+    // 合成所有中间件
+    const fn = this.compose(this.middleware);
+
+    const handleRequest = (req, res) => {
+      const ctx = this.createContext(req, res);
+      return this.handleRequest(ctx, fn)
+    };
+
+    return handleRequest;
+  }
+
+  handleRequest(ctx, fnMiddleware) {
+    const handleResponse = () => respond(ctx);
+    // 执行中间件并把最后的结果交给respond
+    return fnMiddleware(ctx).then(handleResponse);
   }
 
   createContext(req, res) {
@@ -330,7 +559,6 @@ class Application {
 module.exports = Application;
 
 function respond(ctx) {
-  // 根据ctx.body的类型，返回最后的数据
   let content = ctx.body;
   if (typeof content === 'string') {
     ctx.res.end(content);
@@ -339,4 +567,155 @@ function respond(ctx) {
     ctx.res.end(JSON.stringify(content));
   }
 }
+```
+测试一下
+```javascript
+const Kao = require('./application');
+const app = new Kao();
+
+app.use(async (ctx, next) => {
+  console.log('1-start');
+  await next();
+  console.log('1-end');
+})
+
+app.use(async (ctx) => {
+  console.log('2-start');
+  ctx.body = 'hello tc';
+  console.log('2-end');
+});
+
+app.listen(3001, () => {
+  console.log('server start at 3001');
+});
+
+// 1-start 2-start 2-end 1-end
+
+```
+
+### 错误处理机制
+因为`compose`组合之后的函数返回的仍然是Promise对象，所以我们可以在`catch`捕获异常
+
+`kao/application.js`
+```javascript
+handleRequest(ctx, fnMiddleware) {
+  const handleResponse = () => respond(ctx);
+  const onerror = err => ctx.onerror(err);
+  // catch捕获，触发ctx的onerror方法
+  return fnMiddleware(ctx).then(handleResponse).catch(onerror);
+}
+```
+
+`kao/context.js`
+```javascript
+const proto = module.exports = {
+  // context自身的方法
+  onerror(err) {
+    // 中间件报错捕获
+    const { res } = this;
+
+    if ('ENOENT' == err.code) {
+      err.status = 404;
+    } else {
+      err.status = 500;
+    }
+    this.status = err.status;
+    res.end(err.message || 'Internal error');
+  }
+}
+```
+```javascript
+const Kao = require('./application');
+const app = new Kao();
+
+app.use(async (ctx) => {
+  // 报错可以捕获
+  a.b.c = 1;
+  ctx.body = 'hello tc';
+});
+
+app.listen(3001, () => {
+  console.log('server start at 3001');
+});
+```
+现在我们已经实现了中间件的错误异常捕获，但是我们还缺少框架层发生错误的捕获机制。我们可以让`Application`继承原生的`EventEmitter`，从而实现`error`监听
+
+`kao/application.js`
+```javascript
+const Emitter = require('events');
+
+// 继承Emitter
+class Application extends Emitter {
+  constructor() {
+    // 调用super
+    super();
+    this.middleware = [];
+    this.context = Object.create(context);
+    this.request = Object.create(request);
+    this.response = Object.create(response);
+  }
+}
+```
+`kao/context.js`
+```javascript
+const proto = module.exports = {
+  onerror(err) {
+    const { res } = this;
+
+    if ('ENOENT' == err.code) {
+      err.status = 404;
+    } else {
+      err.status = 500;
+    }
+
+    this.status = err.status;
+
+    // 触发error事件
+    this.app.emit('error', err, this);
+
+    res.end(err.message || 'Internal error');
+  }
+}
+```
+
+```javascript
+const Kao = require('./application');
+const app = new Kao();
+
+app.use(async (ctx) => {
+  // 报错可以捕获
+  a.b.c = 1;
+  ctx.body = 'hello tc';
+});
+
+app.listen(3001, () => {
+  console.log('server start at 3001');
+});
+
+// 监听error事件
+app.on('error', (err) => {
+  console.log(err.stack);
+});
+```
+
+至此我们可以了解到Koa异常捕获的两种方式：
+* 中间件捕获(Promise catch)
+* 框架捕获(Emitter error)
+
+```js
+// 捕获全局异常的中间件
+app.use(async (ctx, next) => {
+  try {
+    await next()
+  } catch (error) {
+    return ctx.body = 'error'
+  }
+}
+)
+```
+```js
+// 事件监听
+app.on('error', err => {
+  console.log('error happends: ', err.stack);
+});
 ```
