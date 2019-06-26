@@ -7,6 +7,8 @@ toc: true
 Koa源码十分精简，只有不到2k行的代码，总共由4个模块文件组成，非常适合我们来学习。
 ![koa1](http://pic.deepred5.com/koa1.png)
 
+参考代码: [learn-koa2](https://github.com/deepred5/learn-koa2) 
+
 我们先来看段原生Node实现Server服务器的代码：
 ```javascript
 const http = require('http');
@@ -66,11 +68,11 @@ Koa使用了中间件的概念来完成对一个http请求的处理，同时，K
 * 中间件中的`next`到底是啥？为什么执行`next`就进入了下一个中间件？
 * 所有中间件执行完成后，为什么可以再次返回原来的中间件(洋葱模型)？
 
-现在让我们带着疑惑，进行源码解读，同时自己实现一个简易版的Koa吧！
+现在让我们带着疑惑，进行源码解读，同时自己实现一个简易版的[Koa](https://github.com/deepred5/learn-koa2/tree/master/kao)吧！
 
 
 ### 封装http Server
-
+参考代码: [step-1](https://github.com/deepred5/learn-koa2/tree/master/step-1)
 ```javascript
 // Koa的使用方法
 const Koa = require('koa');
@@ -123,7 +125,7 @@ app.listen(3001, () => {
   console.log('server start at 3001');
 });
 ```
-我们已经初步封装好httP server：通过`new`实例一个对象，`use`注册回调函数，`listen`启动server并传入回调。
+我们已经初步封装好http server：通过`new`实例一个对象，`use`注册回调函数，`listen`启动server并传入回调。
 
 注意的是：调用`new`时，其实没有开启server服务器，真正开启是在`listen`调用时。
 
@@ -134,6 +136,8 @@ app.listen(3001, () => {
 我们先来解决第一个问题
 
 ### 封装req和res对象，构造context
+参考代码: [step-2](https://github.com/deepred5/learn-koa2/tree/master/step-2)
+
 先来介绍下ES6中的get和set [参考](https://segmentfault.com/a/1190000009029639)
 
 基于普通对象的get和set
@@ -249,6 +253,12 @@ module.exports = {
 
   set body(val) {
     // 源码里有对val类型的各种判断，这里省略
+    /* 可能的类型
+    1. string
+    2. Buffer
+    3. Stream
+    4. Object
+    */
     this._body = val;
   }
 }
@@ -308,9 +318,9 @@ delegate(proto, 'request')
 delegate(proto, 'response')
   .access('length')
 ```
-因此`context.js`比较适合使用`delegate`代理。
+因此`context.js`比较适合使用`delegate`，仅仅是代理`request`和`response`的属性和方法。
 
-真正注入原生对象，是在`application.js`里注入的！！！
+真正注入原生对象，是在`application.js`里的`createContext`方法中注入的！！！
 ```javascript
 const http = require('http');
 const context = require('./context');
@@ -391,7 +401,29 @@ function respond(ctx) {
 
 ![](http://pic.deepred5.com/koa2.png)
 
+现在我们再来测试一下:
+`kao/index.js`
+```javascript
+const Kao = require('./application');
+const app = new Kao();
+
+// 使用ctx修改状态码和响应内容
+app.use(async (ctx) => {
+  ctx.status = 200;
+  ctx.body = {
+    code: 1,
+    message: 'ok',
+    url: ctx.url
+  };
+});
+
+app.listen(3001, () => {
+  console.log('server start at 3001');
+});
+```
+
 ### 中间件机制
+参考代码: [step-3](https://github.com/deepred5/learn-koa2/tree/master/step-3)
 ```javascript
 const greeting = (firstName, lastName) => firstName + ' ' + lastName
 const toUpper = str => str.toUpperCase()
@@ -431,7 +463,7 @@ function compose(funcs) {
 Koa的中间件机制类似上面的`compose`，同样是把多个函数包装成一个，但是koa的中间件类似洋葱模型，也就是从A中间件执行到B中间件，B中间件执行完成以后，仍然可以再次回到A中间件。
 ![](https://raw.githubusercontent.com/fengmk2/koa-guide/master/onion.png)
 
-Koa使用了`koa-compose`实现了中间件机制，源码非常精简，但是有点难懂。
+Koa使用了`koa-compose`实现了中间件机制，源码非常精简，但是有点难懂。建议先了解下[递归](http://anata.me/2018/07/30/%E7%AE%80%E5%8D%95%E6%98%93%E6%87%82%E7%9A%84%E7%8E%B0%E4%BB%A3%E9%AD%94%E6%B3%95-%E9%80%92%E5%BD%92/)
 ```javascript
 
 function compose (middleware) {
@@ -506,7 +538,12 @@ fn(context).then(() => {
   console.log(context);
 });
 ```
-弄懂了中间件机制，我们应该可以回答之前的问题：`next`到底是啥？
+递归调用栈的执行情况：
+![](http://pic.deepred5.com/koa.gif)
+
+弄懂了中间件机制，我们应该可以回答之前的问题：
+
+> `next`到底是啥？洋葱模型是怎么实现的？
 
 next就是一个包裹了dispatch的函数
 
@@ -589,6 +626,7 @@ class Application {
     ctx.response = Object.create(this.response);
     ctx.req = ctx.request.req = req;
     ctx.res = ctx.response.res = res;
+    ctx.app = ctx.request.app = ctx.response.app = this;
     return ctx;
   }
 
@@ -636,6 +674,8 @@ app.listen(3001, () => {
 ```
 
 ### 错误处理机制
+参考代码: [step-4](https://github.com/deepred5/learn-koa2/tree/master/step-4)
+
 因为`compose`组合之后的函数返回的仍然是Promise对象，所以我们可以在`catch`捕获异常
 
 `kao/application.js`
@@ -763,10 +803,9 @@ app.on('error', err => {
 ```
 
 ### 总结
-
 Koa整个流程可以分成三步:
 
-初始化阶段:
+**初始化阶段:**
 ```javascript
 const Koa = require('koa');
 const app = new Koa();
@@ -781,12 +820,13 @@ app.listen(3000);
 `new`初始化一个实例，`use`搜集中间件到middleware数组，`listen` 合成中间件`fnMiddleware`，返回一个callback函数给`http.createServer`，开启服务器，等待http请求。
 
 
-请求阶段:
+**请求阶段:**
 
 每次请求，`createContext`生成一个新的`ctx`，传给`fnMiddleware`，触发中间件的整个流程
 
-响应阶段:
+**响应阶段:**
 
 整个中间件完成后，调用`respond`方法，对请求做最后的处理，返回响应给客户端。
 
+参考下面的流程图:
 ![](http://pic.deepred5.com/koa3.png)
