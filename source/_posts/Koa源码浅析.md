@@ -192,6 +192,19 @@ Object.defineProperty(demo, 'name', {
 ```
 
 还有`__defineSetter__`和`__defineGetter__`的实现，不过现已废弃。
+```javascript
+const demo = {
+  _name: ''
+};
+
+demo.__defineGetter__('name', function() {
+  return this._name;
+});
+
+demo.__defineSetter__('name', function(val) {
+  this._name = val;
+});
+```
 
 主要区别是，`Object.defineProperty` `__defineSetter__`可以动态设置属性，而其他方式只能在定义时设置。
 
@@ -263,7 +276,7 @@ const proto = module.exports = {
   },
 }
 
-// delegates NPM包 原理就是__defineGetter__和__defineSetter__
+// delegates 原理就是__defineGetter__和__defineSetter__
 
 // method是委托方法，getter委托getter,access委托getter和setter。
 
@@ -376,6 +389,8 @@ function respond(ctx) {
 
 `respond`才是最后返回http响应的方法。根据执行完所有中间件后`ctx.body`的类型，调用`res.end`结束此次http请求。
 
+![](http://pic.deepred5.com/koa2.png)
+
 ### 中间件机制
 ```javascript
 const greeting = (firstName, lastName) => firstName + ' ' + lastName
@@ -436,14 +451,29 @@ function compose (middleware) {
     let index = -1
     return dispatch(0)
     function dispatch (i) {
+      // 一个中间件里多次调用next
       if (i <= index) return Promise.reject(new Error('next() called multiple times'))
       index = i
+      // fn就是当前的中间件
       let fn = middleware[i]
-      if (i === middleware.length) fn = next
-      if (!fn) return Promise.resolve()
+      if (i === middleware.length) fn = next // 最后一个中间件如果也next时进入(一般最后一个中间件是直接操作ctx.body，并不需要next了)
+      if (!fn) return Promise.resolve() // 没有中间件，直接返回成功
       try {
+        
+        /* 
+          * 使用了bind函数返回新的函数，类似下面的代码
+          return Promise.resolve(fn(context, function next () {
+            return dispatch(i + 1)
+          }))
+        */
+        // dispatch.bind(null, i + 1)就是中间件里的next参数，调用它就可以进入下一个中间件
+
+        // fn如果返回的是Promise对象，Promise.resolve直接把这个对象返回
+        // fn如果返回的是普通对象，Promise.resovle把它Promise化
         return Promise.resolve(fn(context, dispatch.bind(null, i + 1)));
       } catch (err) {
+        // 中间件是async的函数，报错不会走这里，直接在fnMiddleware的catch中捕获
+        // 捕获中间件是普通函数时的报错,Promise化，这样才能走到fnMiddleware的catch方法
         return Promise.reject(err)
       }
     }
@@ -476,8 +506,19 @@ fn(context).then(() => {
   console.log(context);
 });
 ```
-弄懂了中间件机制，我们修改`kao/application.js`
+弄懂了中间件机制，我们应该可以回答之前的问题：`next`到底是啥？
 
+next就是一个包裹了dispatch的函数
+
+在第n个中间件中执行next，就是执行dispatch(n+1)，也就是进入第n+1个中间件
+
+因为dispatch返回的都是Promise，所以在第n个中间件await next(); 进入第n+1个中间件。当第n+1个中间件执行完成后，可以返回第n个中间件
+
+如果在某个中间件中不再调用next，那么它之后的所有中间件都不会再调用了
+
+
+
+修改`kao/application.js`
 ```javascript
 class Application {
   constructor() {
@@ -720,3 +761,32 @@ app.on('error', err => {
   console.log('error happends: ', err.stack);
 });
 ```
+
+### 总结
+
+Koa整个流程可以分成三步:
+
+初始化阶段:
+```javascript
+const Koa = require('koa');
+const app = new Koa();
+
+app.use(async ctx => {
+  ctx.body = 'Hello World';
+});
+
+app.listen(3000);
+```
+
+`new`初始化一个实例，`use`搜集中间件到middleware数组，`listen` 合成中间件`fnMiddleware`，返回一个callback函数给`http.createServer`，开启服务器，等待http请求。
+
+
+请求阶段:
+
+每次请求，`createContext`生成一个新的`ctx`，传给`fnMiddleware`，触发中间件的整个流程
+
+响应阶段:
+
+整个中间件完成后，调用`respond`方法，对请求做最后的处理，返回响应给客户端。
+
+![](http://pic.deepred5.com/koa3.png)
