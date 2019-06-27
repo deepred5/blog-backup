@@ -198,16 +198,16 @@ Object.defineProperty(demo, 'name', {
 基于`Proxy`的get和set
 ```javascript
 const demo = {
-  name: ''
+  _name: ''
 };
 
 const proxy = new Proxy(demo, {
   get: function(target, name) {
-    return target[name];
+    return name === 'name' ? target['_name'] : undefined;
   },
 
   set: function(target, name, val) {
-    target[name] = val;
+    name === 'name' && (target['_name'] = val)
   }
 });
 ```
