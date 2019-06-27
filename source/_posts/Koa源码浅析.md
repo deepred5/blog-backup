@@ -195,6 +195,23 @@ Object.defineProperty(demo, 'name', {
 });
 ```
 
+基于`Proxy`的get和set
+```javascript
+const demo = {
+  name: ''
+};
+
+const proxy = new Proxy(demo, {
+  get: function(target, name) {
+    return target[name];
+  },
+
+  set: function(target, name, val) {
+    target[name] = val;
+  }
+});
+```
+
 还有`__defineSetter__`和`__defineGetter__`的实现，不过现已废弃。
 ```javascript
 const demo = {
