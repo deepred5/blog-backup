@@ -227,7 +227,7 @@ demo.__defineSetter__('name', function(val) {
 });
 ```
 
-主要区别是，`Object.defineProperty` `__defineSetter__`可以动态设置属性，而其他方式只能在定义时设置。
+主要区别是，`Object.defineProperty` `__defineSetter__` `Proxy`可以动态设置属性，而其他方式只能在定义时设置。
 
 Koa源码中 `request.js`和`response.js`就使用了大量的`get`和`set`来代理
 
