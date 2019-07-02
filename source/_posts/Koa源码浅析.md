@@ -7,6 +7,8 @@ toc: true
 Koa源码十分精简，只有不到2k行的代码，总共由4个模块文件组成，非常适合我们来学习。
 ![koa1](http://pic.deepred5.com/koa1.png)
 
+参考代码: [learn-koa2](https://github.com/deepred5/learn-koa2) 
+
 我们先来看段原生Node实现Server服务器的代码：
 ```javascript
 const http = require('http');
@@ -66,11 +68,11 @@ Koa使用了中间件的概念来完成对一个http请求的处理，同时，K
 * 中间件中的`next`到底是啥？为什么执行`next`就进入了下一个中间件？
 * 所有中间件执行完成后，为什么可以再次返回原来的中间件(洋葱模型)？
 
-现在让我们带着疑惑，进行源码解读，同时自己实现一个简易版的Koa吧！
+现在让我们带着疑惑，进行源码解读，同时自己实现一个简易版的[Koa](https://github.com/deepred5/learn-koa2/tree/master/kao)吧！
 
 
 ### 封装http Server
-
+参考代码: [step-1](https://github.com/deepred5/learn-koa2/tree/master/step-1)
 ```javascript
 // Koa的使用方法
 const Koa = require('koa');
@@ -123,7 +125,7 @@ app.listen(3001, () => {
   console.log('server start at 3001');
 });
 ```
-我们已经初步封装好httP server：通过`new`实例一个对象，`use`注册回调函数，`listen`启动server并传入回调。
+我们已经初步封装好http server：通过`new`实例一个对象，`use`注册回调函数，`listen`启动server并传入回调。
 
 注意的是：。
 
@@ -134,6 +136,8 @@ app.listen(3001, () => {
 我们先来解决第一个问题
 
 ### 封装req和res对象，构造context
+参考代码: [step-2](https://github.com/deepred5/learn-koa2/tree/master/step-2)
+
 先来介绍下ES6中的get和set [参考](https://segmentfault.com/a/1190000009029639)
 
 基于普通对象的get和set
@@ -191,9 +195,39 @@ Object.defineProperty(demo, 'name', {
 });
 ```
 
-还有`__defineSetter__`和`__defineGetter__`的实现，不过现已废弃。
+基于`Proxy`的get和set
+```javascript
+const demo = {
+  _name: ''
+};
 
-主要区别是，`Object.defineProperty` `__defineSetter__`可以动态设置属性，而其他方式只能在定义时设置。
+const proxy = new Proxy(demo, {
+  get: function(target, name) {
+    return name === 'name' ? target['_name'] : undefined;
+  },
+
+  set: function(target, name, val) {
+    name === 'name' && (target['_name'] = val)
+  }
+});
+```
+
+还有`__defineSetter__`和`__defineGetter__`的实现，不过现已废弃。
+```javascript
+const demo = {
+  _name: ''
+};
+
+demo.__defineGetter__('name', function() {
+  return this._name;
+});
+
+demo.__defineSetter__('name', function(val) {
+  this._name = val;
+});
+```
+
+主要区别是，`Object.defineProperty` `__defineSetter__` `Proxy`可以动态设置属性，而其他方式只能在定义时设置。
 
 Koa源码中 `request.js`和`response.js`就使用了大量的`get`和`set`来代理
 
@@ -236,6 +270,12 @@ module.exports = {
 
   set body(val) {
     // 源码里有对val类型的各种判断，这里省略
+    /* 可能的类型
+    1. string
+    2. Buffer
+    3. Stream
+    4. Object
+    */
     this._body = val;
   }
 }
@@ -263,7 +303,7 @@ const proto = module.exports = {
   },
 }
 
-// delegates NPM包 原理就是__defineGetter__和__defineSetter__
+// delegates 原理就是__defineGetter__和__defineSetter__
 
 // method是委托方法，getter委托getter,access委托getter和setter。
 
@@ -295,9 +335,9 @@ delegate(proto, 'request')
 delegate(proto, 'response')
   .access('length')
 ```
-因此`context.js`比较适合使用`delegate`代理。
+因此`context.js`比较适合使用`delegate`，仅仅是代理`request`和`response`的属性和方法。
 
-真正注入原生对象，是在`application.js`里注入的！！！
+真正注入原生对象，是在`application.js`里的`createContext`方法中注入的！！！
 ```javascript
 const http = require('http');
 const context = require('./context');
@@ -376,7 +416,31 @@ function respond(ctx) {
 
 `respond`才是最后返回http响应的方法。根据执行完所有中间件后`ctx.body`的类型，调用`res.end`结束此次http请求。
 
+![](http://pic.deepred5.com/koa2.png)
+
+现在我们再来测试一下:
+`kao/index.js`
+```javascript
+const Kao = require('./application');
+const app = new Kao();
+
+// 使用ctx修改状态码和响应内容
+app.use(async (ctx) => {
+  ctx.status = 200;
+  ctx.body = {
+    code: 1,
+    message: 'ok',
+    url: ctx.url
+  };
+});
+
+app.listen(3001, () => {
+  console.log('server start at 3001');
+});
+```
+
 ### 中间件机制
+参考代码: [step-3](https://github.com/deepred5/learn-koa2/tree/master/step-3)
 ```javascript
 const greeting = (firstName, lastName) => firstName + ' ' + lastName
 const toUpper = str => str.toUpperCase()
@@ -416,7 +480,7 @@ function compose(funcs) {
 Koa的中间件机制类似上面的`compose`，同样是把多个函数包装成一个，但是koa的中间件类似洋葱模型，也就是从A中间件执行到B中间件，B中间件执行完成以后，仍然可以再次回到A中间件。
 ![](https://raw.githubusercontent.com/fengmk2/koa-guide/master/onion.png)
 
-Koa使用了`koa-compose`实现了中间件机制，源码非常精简，但是有点难懂。
+Koa使用了`koa-compose`实现了中间件机制，源码非常精简，但是有点难懂。建议先了解下[递归](http://anata.me/2018/07/30/%E7%AE%80%E5%8D%95%E6%98%93%E6%87%82%E7%9A%84%E7%8E%B0%E4%BB%A3%E9%AD%94%E6%B3%95-%E9%80%92%E5%BD%92/)
 ```javascript
 
 function compose (middleware) {
@@ -436,14 +500,29 @@ function compose (middleware) {
     let index = -1
     return dispatch(0)
     function dispatch (i) {
+      // 一个中间件里多次调用next
       if (i <= index) return Promise.reject(new Error('next() called multiple times'))
       index = i
+      // fn就是当前的中间件
       let fn = middleware[i]
-      if (i === middleware.length) fn = next
-      if (!fn) return Promise.resolve()
+      if (i === middleware.length) fn = next // 最后一个中间件如果也next时进入(一般最后一个中间件是直接操作ctx.body，并不需要next了)
+      if (!fn) return Promise.resolve() // 没有中间件，直接返回成功
       try {
+        
+        /* 
+          * 使用了bind函数返回新的函数，类似下面的代码
+          return Promise.resolve(fn(context, function next () {
+            return dispatch(i + 1)
+          }))
+        */
+        // dispatch.bind(null, i + 1)就是中间件里的next参数，调用它就可以进入下一个中间件
+
+        // fn如果返回的是Promise对象，Promise.resolve直接把这个对象返回
+        // fn如果返回的是普通对象，Promise.resovle把它Promise化
         return Promise.resolve(fn(context, dispatch.bind(null, i + 1)));
       } catch (err) {
+        // 中间件是async的函数，报错不会走这里，直接在fnMiddleware的catch中捕获
+        // 捕获中间件是普通函数时的报错,Promise化，这样才能走到fnMiddleware的catch方法
         return Promise.reject(err)
       }
     }
@@ -476,8 +555,24 @@ fn(context).then(() => {
   console.log(context);
 });
 ```
-弄懂了中间件机制，我们修改`kao/application.js`
+递归调用栈的执行情况：
+![](http://pic.deepred5.com/koa.gif)
 
+弄懂了中间件机制，我们应该可以回答之前的问题：
+
+> `next`到底是啥？洋葱模型是怎么实现的？
+
+next就是一个包裹了dispatch的函数
+
+在第n个中间件中执行next，就是执行dispatch(n+1)，也就是进入第n+1个中间件
+
+因为dispatch返回的都是Promise，所以在第n个中间件await next(); 进入第n+1个中间件。当第n+1个中间件执行完成后，可以返回第n个中间件
+
+如果在某个中间件中不再调用next，那么它之后的所有中间件都不会再调用了
+
+
+
+修改`kao/application.js`
 ```javascript
 class Application {
   constructor() {
@@ -548,6 +643,7 @@ class Application {
     ctx.response = Object.create(this.response);
     ctx.req = ctx.request.req = req;
     ctx.res = ctx.response.res = res;
+    ctx.app = ctx.request.app = ctx.response.app = this;
     return ctx;
   }
 
@@ -595,6 +691,8 @@ app.listen(3001, () => {
 ```
 
 ### 错误处理机制
+参考代码: [step-4](https://github.com/deepred5/learn-koa2/tree/master/step-4)
+
 因为`compose`组合之后的函数返回的仍然是Promise对象，所以我们可以在`catch`捕获异常
 
 `kao/application.js`
@@ -720,3 +818,32 @@ app.on('error', err => {
   console.log('error happends: ', err.stack);
 });
 ```
+
+### 总结
+Koa整个流程可以分成三步:
+
+**初始化阶段:**
+```javascript
+const Koa = require('koa');
+const app = new Koa();
+
+app.use(async ctx => {
+  ctx.body = 'Hello World';
+});
+
+app.listen(3000);
+```
+
+`new`初始化一个实例，`use`搜集中间件到middleware数组，`listen` 合成中间件`fnMiddleware`，返回一个callback函数给`http.createServer`，开启服务器，等待http请求。
+
+
+**请求阶段:**
+
+每次请求，`createContext`生成一个新的`ctx`，传给`fnMiddleware`，触发中间件的整个流程
+
+**响应阶段:**
+
+整个中间件完成后，调用`respond`方法，对请求做最后的处理，返回响应给客户端。
+
+参考下面的流程图:
+![](http://pic.deepred5.com/koa3.png)
