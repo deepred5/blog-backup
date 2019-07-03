@@ -127,7 +127,7 @@ app.listen(3001, () => {
 ```
 我们已经初步封装好http server：通过`new`实例一个对象，`use`注册回调函数，`listen`启动server并传入回调。
 
-注意的是：。
+注意的是：调用`new`时，其实没有开启server服务器，真正开启是在`listen`调用时。
 
 不过这段代码有明显的不足:
 * use传入的回调函数，接收的参数依旧是原生的`req`和`res`
@@ -847,3 +847,5 @@ app.listen(3000);
 
 参考下面的流程图:
 ![](http://pic.deepred5.com/koa3.png)
+
+公司内部技术分享[PPT](http://pic.deepred5.com/3_koa%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90.pptx)
