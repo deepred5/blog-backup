@@ -18,6 +18,8 @@ tags: [lerna, npm， monorepo]
 
 本文主要介绍下lerna的使用
 
+[源码参考](https://github.com/deepred5/learn-lerna)
+
 #### lerna
 全局安装[lerna](https://lerna.js.org/)
 ```
@@ -27,7 +29,6 @@ lerna是基于git的，在github上新建一个项目`learn-lerna`
 ```
 git clone git@github.com:deepred5/learn-lerna.git
 cd learn-lerna
-git init
 ```
 
 初始化项目:
@@ -42,7 +43,7 @@ lerna会自动创建一个`packages`目录夹，我们以后的项目都新建�
   "packages": [
     "packages/*"
   ],
-  "version": "0.0.0"
+  "version": "0.0.0" // 共用的版本，由lerna管理
 }
 ```
 #### 创建package
@@ -59,7 +60,7 @@ mkdir prpr-lerna-popular
 cd prpr-lerna-popular
 npm init -y
 ```
-**注意：这两个package我们最后都是要发布到npmjs上的，所以名字请取特殊些，不能被人用过**
+**注意：这两个package我们最后都是要发布到npm上的，所以名字请取特殊些，不能被人用过**
 
 #### 添加依赖
 `prpr-lerna-popular`依赖`prpr-lerna-core`，这时有两种方法添加依赖：
