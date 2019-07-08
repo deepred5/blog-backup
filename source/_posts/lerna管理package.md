@@ -7,6 +7,8 @@ tags: [lerna, npm， monorepo]
 
 ![](http://pic.deepred5.com/lerna1.png)
 
+<!-- more -->
+
 我们平常一般采用的都是`multiple repositories`的项目管理模式：把一个大项目拆分成若干个小项目，每个小项目都独立的放在gitlab上。这种模式其实也没啥不好，但是某些情况下，子项目A依赖子项目B，如果子项目B经常改动，那么每次B改动了，都要修改A，这时就非常麻烦。在开发一个前端框架或者UI库时，就经常会遇到上述情况，这时我们就可以考虑下`monorepo`。
 
 `monorepo`说到底也只是一个理念，那么怎么才能实现这种代码组织呢？
