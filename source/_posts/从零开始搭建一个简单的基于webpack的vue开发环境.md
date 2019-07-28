@@ -4,11 +4,19 @@ date: 2018-01-08 21:24:28
 tags: [webpack, vue]
 toc: true
 ---
+
+更新：2019/07/28
+
+[从零开始搭建一个简单的基于webpack的react开发环境](http://anata.me/2019/06/04/%E5%82%BB%E5%82%BB%E5%88%86%E4%B8%8D%E6%B8%85%E7%9A%84Manifest/#%E5%9F%BA%E4%BA%8Ewebpack%E7%9A%84react%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83)
+
+原文:
+
 都8102年了，现在还来谈webpack的配置，额，是有点晚了。而且，基于vue-cli或者create-react-app生成的项目，也已经一键为我们配置好了webpack，看起来似乎并不需要我们深入了解。
 
 不过，为了学习和理解webpack解决了前端的哪些痛点，还是有必要从零开始自己搭建一个简单的开发环境。本文的webpack配置参考了vue-cli提供`webpack-simple `模板，这也是vue-cli里面最简单的一个webpack配置，非常适合从零开始学习。
 
 **注： 本文webpack基于3.10.0 **
+
 
 ###  [演示代码下载](https://github.com/deepred5/vue-webpack-simple) 
 
