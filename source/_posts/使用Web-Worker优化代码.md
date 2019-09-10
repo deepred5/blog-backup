@@ -117,7 +117,7 @@ myWorker.onmessage = function (e) {
 const list = await request('/api/getExcelData');
 myWorker.postMessage(list);
 ```
-当然实际项目，我们一般都是用webpack打包的，这时就需要进行一些特别处理，需要使用[worker-loader](https://github.com/webpack-contrib/worker-loader),可以参考[《怎么在 ES6+Webpack 下使用 Web Worker》](https://juejin.im/post/5acf348151882579ef4f5a77)文章学习。
+当然实际项目，我们一般都是用webpack打包的，这时就要进行一些特别处理，需要使用[worker-loader](https://github.com/webpack-contrib/worker-loader),可以参考[《怎么在 ES6+Webpack 下使用 Web Worker》](https://juejin.im/post/5acf348151882579ef4f5a77)文章学习。
 
 #### 进一步优化
 在上面的代码修改中，我们只是优化了业务逻辑里面的map操作。因为我使用的js库是`js-export-excel`,从它的[源码](https://github.com/cuikangjie/js-export-excel/blob/master/src/js-export-excel.js#L123)里可以看见，对于我们传进来的数据，它还会再一次forEach循环操作，进行数据的二进制转换。因此，这一步的forEach循环，理论上也可以在web worker里面进行操作。
@@ -134,6 +134,7 @@ onmessage = function(e) {
 
   // 直接在worker里面生成excel
   const toExcel = new ExportJsonExcel(format).saveExcel();
+}
 ```
 直接在`worker.js`里面生成excel。然而，`saveExcel`这个方法需要用到`document`对象，但是在worker里，我们不能访问类似`window` `document`的全局对象。
 
@@ -168,6 +169,7 @@ onmessage = function(e) {
   // saveExcel只返回blob数据
   const blob = new ExportJsonExcel(format).saveExcel();
   postMessage(blob);
+}
 ```
 `index.js`
 ```javascript
