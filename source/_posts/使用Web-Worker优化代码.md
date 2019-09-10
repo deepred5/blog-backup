@@ -90,7 +90,7 @@ if (window.Worker) {
 ```
 点击btn2时，页面并不会卡死，你可以正常的对input进行输入操作
 
-我们开启了一个单独的worker线程来进行复杂操作，通过`postMessage`和`onmessage`来进行两个进程间的通信。
+我们开启了一个单独的worker线程来进行复杂操作，通过`postMessage`和`onmessage`来进行两个线程间的通信。
 
 #### 优化导出excel表格
 看过前面的例子，我们可以同理使用web worker进行复杂的map操作
@@ -176,7 +176,7 @@ onmessage = function(e) {
 myWorker.onmessage = function (e) {
   // 在主线程生成excel
   saveAs(
-    new Blob([s2ab(wbout)], {
+    new Blob([e.data], {
       type: "application/octet-stream"
     }),
    "test.xlsx"
