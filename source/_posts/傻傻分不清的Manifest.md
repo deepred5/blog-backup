@@ -10,6 +10,7 @@ toc: true
 2. [PWA](https://developer.mozilla.org/zh-CN/docs/Web/Manifest): 将Web应用程序安装到设备的主屏幕
 3. webpack中[webpack-manifest-plugin](https://www.npmjs.com/package/webpack-manifest-plugin)插件打包出来的`manifest.json`文件，用来生成一份资源清单，为后端渲染服务 
 4. webpack中[DLL](https://webpack.js.org/plugins/dll-plugin/#root)打包时,输出的`manifest.json`文件，用来分析已经打包过的文件，优化打包速度和大小
+5. webpack中[manifest](https://www.webpackjs.com/concepts/manifest/)运行时代码
 
 下面我们来一一介绍下
 <!-- more -->
@@ -706,13 +707,26 @@ module.exports = {
 
 ![](http://pic.deepred5.com/m4.png)
 
+#### runtime
+webpack中有[运行时](https://www.webpackjs.com/concepts/manifest/)的概念,比如我们通过webpack打包后分割成了`dll.js`,`vendors.js`,`main.js`,那这三个代码，到底哪个先调用，哪个后调用，他们运行顺序就是由运行时代码组织(通过读取`manifest`数据)
+
+通常情况下我们无需关心运行时代码，但如果希望尽可能的优化浏览器缓存，那么我们可以把运行时代码单独提取出来，这样某些文件发生改变后，一些与之相关的文件hash值并不会也随之改变。
+
+通过配置`runtimeChunk`即可
+```javascript
+optimization: {
+    runtimeChunk: { name: 'manifest' }
+}
+```
+
 #### 小结
 
-我们介绍了4种`manifest`相关的前端技术。`manifest`的英文含义是**名单**, 4种技术的确都是把`manifest`当做清单使用：
+我们介绍了5种`manifest`相关的前端技术。`manifest`的英文含义是**名单**, 5种技术的确都是把`manifest`当做清单使用：
 1. 缓存清单
 2. PWA清单
 3. 打包资源路径清单
 4. dll打包清单
+5. 代码加载顺序清单
 
 只不过是在不同的场景中使用特定的清单来完成某些功能
 
