@@ -3,7 +3,7 @@ title: '森罗万象 & SawanoHiroyuki[nZk]'
 date: 2019-09-15 20:54:11
 tags: [随笔]
 ---
-来魔都也就半年，倒是听了两场演唱会，还是挺过瘾的。KOKIA的森罗万象和泽野弘之的nZk感觉是两个极端：静与动的对立。如果说kokia是一首静谧的诗，那泽野绝对是一支奔放的舞。
+来魔都一段时间了，期间听了两场演唱会，还是挺过瘾的。KOKIA的森罗万象和泽野弘之的nZk感觉是两个极端：静与动的对立。如果说kokia是一首静谧的诗，那泽野绝对是一支奔放的舞。
 
 #### 森罗万象
 <img src="http://pic.deepred5.com/kokia1.jpg" style="max-width: 450px" />
@@ -14,7 +14,7 @@ kokia这次演唱会场所比较小，但是舞台效果非常满意。整场演
 
 现场能听到[《EXEC_COSMOFLIPS》](https://music.163.com/#/song?id=4940455)一本满足，虽然听不懂塔语，但是好听就行啊!
 
-遗憾的是演出时间比较短，大概一个小时就落下了帷幕。
+遗憾的是演出时间比较短，大概一个小多时就落下了帷幕。
 
 <img src="http://pic.deepred5.com/kokia2.jpg" style="max-width: 450px" />
 
