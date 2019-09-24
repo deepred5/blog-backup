@@ -1,7 +1,7 @@
 ---
 title: lerna管理package
 date: 2019-07-08 16:24:09
-tags: [lerna, npm， monorepo]
+tags: [lerna, npm, monorepo]
 ---
 最近发现公司一个项目的目录组织挺奇怪的，所有的子项目都放在了`packages`目录里，还有这种骚操作？特意查了下资料，发现是一种比较流行的`monorepo`项目管理模式。近几年比较火的React,Vue,Babel都是用的这种模式:
 
