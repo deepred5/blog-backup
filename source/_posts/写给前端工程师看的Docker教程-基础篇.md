@@ -1,24 +1,26 @@
 ---
-title: 写给前端工程师看的Docker基础知识
+title: 写给前端工程师看的Docker教程-基础篇
 date: 2019-09-29 14:23:20
 tags: [node, Docker]
 toc: true
 ---
-最近公司在推进容器化和k8s，要求项目都要改成Docker部署。负责的项目里有一些node项目，只能从零开始学习Docker了。
+最近公司在推进容器化和k8s，项目都要改成Docker部署。负责的工程里有几个node项目，只能从零开始学习Docker了。
 
 ### 安装
 Docker支持window, Mac, Linux, 教程参考[Docker安装教程](https://www.runoob.com/docker/ubuntu-docker-install.html)。
 
 建议在Mac和Linux系统里使用Docker。
 
-平时开发，我使用的是vscode编辑器，同时建议安装docker插件。在插件商店搜索`docker`，安装完成后，我们可以很方便的管理Docker镜像和容器。
+平时开发，我使用的是vscode编辑器，建议顺便安装docker插件。在插件商店搜索`docker`，安装完成后，我们可以很方便的管理Docker镜像和容器。
+
+<img src="http://pic.deepred5.com/docker1.png" style="width: 45%">
 
 <!-- more -->
 
 ### 快速使用
 首先我们来体验一下Docker。
 
-平时工作中，如果我们电脑的开发环境是Windows, 有一天希望在Linux环境做一些事情，那该怎么办？大多数人这时会选择去用虚拟机安装一个ubuntu系统。不过安装虚拟机前，你得先去下载几个G的镜像，然后在VMware里配置一些参数，最后还要等待最少几十分钟的系统安装。等你安装完一个ubuntu系统后，可能已经花费了几个小时了。
+平时工作中，如果我们电脑的开发环境是Windows, 有一天希望在Linux环境做一些事情，那该怎么办？大多数人这时会选择去用虚拟机安装一个ubuntu系统。不过安装虚拟机前，你得先去下载几个G的镜像，然后在VMware里配置一些参数，最后还要等待最少十几分钟的系统安装。等你安装完一个ubuntu系统，估计已经浪费了几个小时。
 
 然而使用Docker，你只需要几分钟！
 ```bash
@@ -29,7 +31,7 @@ docker run -it --name my-ubuntu --rm ubuntu /bin/bash
 ```
 创建成功后，你就进入一个ubuntu系统里，现在你可以在其中进行任意的操作了。
 
-**注意：虽然当前容器里是ubuntu系统，但是你只能把它想象成一个精简版的ubuntu：所以有很多常用命令，需要自己去安装。**
+**注意：虽然当前容器里是ubuntu系统，但是你只能把它想象成一个精简版的ubuntu，因此有很多常用命令，需要自己去安装。**
 ```bash
 curl -v bilibili.com
 ```
@@ -41,8 +43,8 @@ apt-get install -y curl
 ```
 安装完成后，才能使用`curl`命令
 
+退出容器
 ```bash
-# 退出容器
 exit
 ```
 
@@ -106,7 +108,7 @@ touch Dockerfile
 # 基于node11基础镜像
 FROM node:11
 
-# 一些元数据
+# 一些元数据,比如作者信息
 LABEL maintainer="deepred5 <deepred5@gamil.com>"
 
 # 安装pm2
@@ -149,16 +151,18 @@ docker push deepred5/node-pm2:1.0
 ### 容器(Container)
 我们平时基本都是在和容器打交道。
 ```bash
+# 基于ubuntu镜像创建my-ubuntu容器。如果本地没有ubuntu镜像，会先去docker pull下载
 docker run -it ubuntu:latest --name my-ubuntu /bin/bash
 ```
 参数解释:
--i: 允许你对容器内的标准输入 (STDIN) 进行交互
 
--t: 在新容器内指定一个伪终端或终端。
+`-i`: 允许你对容器内的标准输入 (STDIN) 进行交互
 
-—name: 容器的名字，默认是随机的名字
+`-t`: 在新容器内指定一个伪终端或终端。
 
-/bin/bash: 启动容器后立即执行的命令
+`--name`: 容器的名字，默认是随机的名字
+
+`/bin/bash`: 启动容器后立即执行的命令
 
 ```bash
 # 停止容器
@@ -183,7 +187,7 @@ docker ps -a
 
 `docker start my-ubuntu`启动的容器，虽然容器运行着，但是我们无法进入到容器里。
 
-如果再次进入容器？
+如何再次进入到容器里？
 ```bash
 docker exec -it my-ubuntu /bin/bash
 ```
@@ -191,6 +195,10 @@ docker exec -it my-ubuntu /bin/bash
 **容器运行的两种方式**
 - 交互式运行(-it)
 - 守护式运行(没有交互式会话，长期运行，适合运行应用程序和服务)(-d)
+
+可以这样类比:
+`node index.js`: 交互式运行
+`pm2 start index.js`: 守护式运行
 
 大部分情况都是运行守护式容器(daemonized container)
 
@@ -225,3 +233,7 @@ docker logs --tail 0 -f my_container
 # 加上时间戳
 docker logs -t my_container
 ```
+
+### 参考
+* [只要一小时，零基础入门Docker](https://zhuanlan.zhihu.com/p/23599229)
+* [10分钟看懂Docker和K8S](https://zhuanlan.zhihu.com/p/53260098)
