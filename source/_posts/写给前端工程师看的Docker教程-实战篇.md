@@ -89,7 +89,7 @@ COPY . /app
 # 打包构建
 RUN npm run build
 
-# 拷贝打包文件到nginx
+# 拷贝配置文件到nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
@@ -113,6 +113,12 @@ RUN npm install
 如果这么写，那么每一次重新构建镜像，都需要下载一次npm包，这是非常浪费时间的！而把`package.json`与源文件分隔开写入镜像，这样只有当`package.json`发生改变了，才会重新下载npm包。
 
 当然缓存有时候也会造成一些麻烦，比如在进行一些shell操作输出内容时，由于缓存的存在，导致新构建的镜像里的内容还是旧版本的。
+
+我们可以指定构建镜像时不使用缓存
+```bash
+docker build --no-cache -t deepred5/react-app .
+```
+最佳实践是在文件顶部指定一个环境变量，如果希望不用缓存，则更新这个环境变量即可，因为缓存失效是从第一条发生变化的指令开始。
 
 **打包镜像**
 ```bash
