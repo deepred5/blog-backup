@@ -11,7 +11,7 @@ Docker支持window, Mac, Linux, 教程参考[Docker安装教程](https://www.run
 
 建议在Mac和Linux系统里使用Docker。
 
-平时开发，我使用的是vscode编辑器，建议顺便安装docker插件。在插件商店搜索`docker`，安装完成后，我们可以很方便的管理Docker镜像和容器。
+日常开发，我使用的是vscode编辑器，可以顺便安装docker插件。在插件商店搜索`docker`，安装完成后，我们可以很方便的管理Docker镜像和容器。
 
 <img src="http://pic.deepred5.com/docker1.png" style="width: 45%">
 
