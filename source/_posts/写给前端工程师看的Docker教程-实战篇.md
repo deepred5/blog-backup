@@ -343,7 +343,7 @@ docker run -d --name my-react-app-multi --network app-test  -p 9999:80 deepred5/
 
 访问 http://localhost:9999/api/json/set?age=55 成功返回数据
 
-### Docker componse
+### Docker compose
 
 我们现在这个项目有3个启动镜像:
 * `deepred5/react-app-multi` 前端单页应用
@@ -361,9 +361,9 @@ docker run -d --name my-react-app-multi --network app-test  -p 9999:80 deepred5/
 ```
 这还仅仅只是3个容器的项目，如果容器再多，启动就变得非常复杂了！
 
-这时，就需要`docker componse`出场了。
+这时，就需要`docker compose`出场了。
 
-首先需要安装[docker componse](https://docs.docker.com/compose/install/)，安装完成之后
+首先需要安装[docker compose](https://docs.docker.com/compose/install/)，安装完成之后
 
 我们新建一个`my-all-app`目录，然后新建`docker-compose.yml`
 ```bash
