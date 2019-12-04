@@ -120,7 +120,6 @@ const avatar = new Sprite.from('http://anata.me/img/avatar.jpg');
 
 // 图片宽高缩放0.5
 avatar.scale.set(0.5, 0.5);
-avat
 app.stage.addChild(avatar);
 ```
 
@@ -138,3 +137,6 @@ avatar.on('click', () => {
 app.stage.addChild(avatar);
 ```
 点击图片，即可输出内容
+
+## 基本概念
+`pixi`里有几个重要的模块
