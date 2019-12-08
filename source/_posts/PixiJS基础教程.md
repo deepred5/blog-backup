@@ -1,6 +1,6 @@
 ---
-title: PixiJS入门
-date: 2019-12-04 16:05:08
+title: PixiJS基础教程
+date: 2019-12-04 14:34:14
 tags: [js, canvas, pixi]
 toc: true
 ---
