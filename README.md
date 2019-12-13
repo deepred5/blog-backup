@@ -4,7 +4,7 @@
 
 ### 预览
 ```bash
-hexo s
+npm run start
 ```
 
 ### 发布
