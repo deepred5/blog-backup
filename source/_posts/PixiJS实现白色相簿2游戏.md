@@ -8,13 +8,11 @@ toc: true
 
 ## 体验游戏
 
-**1. 扫码开始游戏，建议佩戴耳机。**
+**1. 扫码开始游戏，建议佩戴耳机。(也可手机直接点击链接[白色相簿2](http://www.deepred5.com/wa/))**
 
 **2. 进入游戏首页，点一下你要选的女主即可进入不同分支。(默认冬马线)**
 
 ![](http://pic.deepred5.com/qrcode.jpg)
-
-手机访问[白色相簿2](http://www.deepred5.com/wa/)
 
 项目源码：[pixi-whitealbum](https://github.com/deepred5/pixi-whitealbum/)
 
