@@ -14,6 +14,8 @@ toc: true
 
 ![](http://pic.deepred5.com/qrcode.jpg)
 
+手机访问[白色相簿2](http://www.deepred5.com/wa/)
+
 项目源码：[pixi-whitealbum](https://github.com/deepred5/pixi-whitealbum/)
 
 <!-- more -->
