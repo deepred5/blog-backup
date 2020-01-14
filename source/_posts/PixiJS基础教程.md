@@ -9,6 +9,8 @@ toc: true
 ## 搭建环境
 **注意：本文使用pixi最新的v5版本，同时使用[Parcel](https://parceljs.org/)进行模块化打包**
 
+`pixi.js`v5版本默认使用webgl渲染，如果希望可以回退到canvas，需要使用`pixi.js-legacy`，详情见[issue](https://github.com/pixijs/pixi.js/issues/5389#issuecomment-457889307)
+
 项目初始化
 ```
 mkdir learn-pixi
