@@ -137,7 +137,7 @@ module.exports = {
 }
 ```
 #### hash
-最后打包出来的文件，我们希望带上hash值，这样可以充分利用浏览器缓存。webpack中的有`hash`，`chuckhash`，`contenthash`：生产环境时，我们一般使用`contenthash`，开发环境并不需要指定hash。
+最后打包出来的文件，我们希望带上hash值，这样可以充分利用浏览器缓存。webpack中有`hash`，`chuckhash`，`contenthash`：生产环境时，我们一般使用`contenthash`，而开发环境其实可以不指定hash。
 ```javascript
 // dev开发环境
 module.exports = {
@@ -157,19 +157,19 @@ module.exports = {
 ```
 
 #### mock和proxy
-开发环境，通常需要mock数据，同时，还需要代理api到指定服务器进行联调的能力。我们可以通过`devServer`配合[mocker-api](https://github.com/jaywcjlove/mocker-api)第三方库实现。
+开发环境，通常需要mock数据，还需要代理api到服务器。我们可以通过`devServer`配合[mocker-api](https://github.com/jaywcjlove/mocker-api)第三方库实现。
 ```javascript
 const apiMocker = require('mocker-api');
 
 // dev开发环境
 module.exports = {
   devServer: {
-    before(app) { // mock数据
+    before(app) { // 本地mock数据
       apiMocker(app, path.resolve(__dirname, '../mock/index.js'))
     },
     proxy: { // 代理接口
       '/api': {
-        target: 'https://anata.me', // 后端地址
+        target: 'https://anata.me', // 后端联调地址
         changeOrigin: true,
         secure: false,
       },
@@ -190,10 +190,8 @@ build
 * `dev`配置`devServer`，方便本地调试开发
 * `prod`打包压缩文件，单独提取css (dev不提取是为了css热更新)，生成静态资源清单`manifest.json`
 
-关于为什么要生成一份`manifest.json`，以及打包后的代码如何部署，我会在下一篇文章详情介绍。
+关于为什么要生成一份`manifest.json`，以及打包后的代码如何部署，我将会在下一篇文章详情介绍。
 
 
 ### 总结
-webpack的学习始终是前端绕不过去的一道坎。通过这次从零搭建多页面打包模板，也算是巩固了一下基础知识，离webpack配置工程师又近了一步。
-
-webpack5也即将发布，真的是~~学不动了~~。
+webpack的学习始终是前端绕不过去的一道坎。通过这次从零搭建多页面打包模板，也算是巩固了一下基础知识，离~~webpack配置工程师~~又近了一步。
