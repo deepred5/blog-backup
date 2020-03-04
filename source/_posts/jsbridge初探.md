@@ -151,7 +151,7 @@ BILISDK.invokeP('getVersion').then((res) => {
   console.log('res', res);
 })
 ```
-现在前端调原生方法，不要直接使用`BILIAPP.invoke`，而是通过`BILISDK.invokeP`间接调用。`BILISDK.invokeP`支持Promise化，同时会维护了一个hash表
+现在前端调原生方法，不要直接使用`BILIAPP.invoke`，而是通过`BILISDK.invokeP`间接调用。`BILISDK.invokeP`支持Promise化，同时维护了一个hash表
 ```javascript
 const BILISDK = {
   callbacks: {
