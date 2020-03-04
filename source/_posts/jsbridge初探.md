@@ -168,8 +168,8 @@ const BILISDK = {
 前面我们实现的`sdk.js`，如果引入web站点呢？
 
 把sdk打包成umd规范的js静态文件，上传到cdn或者发布到npm
-* 在index.html里面直接通过script标签引入或者js直接`import`导入即可。该方案，前端维护sdk。
-* 客户端在初始化一个WebView打开页面时，如果页面地址在白名单中，会直接在HTML的头部注入对应的`sdk.js`。该方案，客户端维护sdk。(**优先推荐**)
+* 在index.html里面直接通过script标签引入或者js直接`import`导入即可。该方案，前端维护sdk。(维护成本高)
+* 客户端在初始化一个WebView打开页面时，直接注入sdk。该方案，客户端维护sdk。(**优先推荐**)
 ### 参考
 1. [Hybrid App技术解析 -- 原理篇](https://juejin.im/post/5b4ff3bee51d4519721b9986)
 2. [小白必看，JSBridge 初探](https://juejin.im/post/5e5248216fb9a07cb0314fc9)
