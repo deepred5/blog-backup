@@ -3,7 +3,7 @@ title: jsbridge初探
 date: 2020-03-04 12:29:51
 tags: [jsbridge]
 ---
-`jsbridge`主要是随着`Hybrid App`的流行而产生的一种技术。那么`Hybrid App`是啥？`Hybrid App`又称`混合App`，即同时使用了前端web技术(js,css,html)和原生native技术(java,kotlin,swfit,object-c)进行开发的移动应用。
+`jsbridge`是随着`Hybrid App`的流行而产生的一种技术。那么`Hybrid App`是啥？`Hybrid App`又称`混合App`，即同时使用了前端web技术(js,css,html)和原生native技术(java,kotlin,swfit,object-c)进行开发的移动应用。
 
 ### 混合开发的优缺点
 * 优点：开发快，易更新，开发周期短，跨平台
