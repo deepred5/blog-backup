@@ -165,7 +165,7 @@ const BILISDK = {
 通过上面的方法，我们就实现了<font color="#F75C2F">js -> native -> js</font> 的双向通信了。当然理论上，我们还需实现：<font color="#DB4D6D">native -> js -> native </font>的双向通信，但是原理是一样的，这时客户端就需要自己实现一个Native-SDK，维护Native端回调函数的Map。
 
 ### JS-SDK的接入
-前面我们实现的`sdk.js`，如果引入web站点呢？
+前面我们实现的`sdk.js`，如何引入web站点呢？
 
 把sdk打包成umd规范的js静态文件，上传到cdn或者发布到npm
 * 在index.html里面直接通过script标签引入或者js直接`import`导入即可。该方案，前端维护sdk。(维护成本高)
