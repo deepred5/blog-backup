@@ -23,6 +23,7 @@ Cookie常见的属性:
 * Expires/Max-Age: cookie过期时间。默认不设置，则是`Session`会话，关闭页面后，该cookie立即失效。
 * HttpOnly: 设成`true`后，JS使用`document.cookie`则访问不到。常用于避免XSS攻击。
 * Secure: 标记为Secure的cookie只应通过被HTTPS协议加密过的请求发送给服务端。
+* SameSite: 用来限制第三方Cookie
 
 **最后一个非常重要的属性，就是我们即将要说的`SameSite`了。**
 
