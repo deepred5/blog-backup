@@ -25,7 +25,7 @@ Cookie常见的属性:
 * Secure: 标记为Secure的cookie只应通过被HTTPS协议加密过的请求发送给服务端。
 * SameSite: 用来限制第三方Cookie
 
-**最后一个非常重要的属性，就是我们即将要说的`SameSite`了。**
+**最后一个属性非常重要，也就是我们即将要说的`SameSite`了。**
 
 ### Cookie携带的场景
 我们假设有一个名字为`sessionId`的`cookie`，`domain`设置成了`.demo.com`。
