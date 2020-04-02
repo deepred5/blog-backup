@@ -60,7 +60,7 @@ router.get('/api/data', (ctx, next) => {
 
 4.在`b.demo.com`域名下，使用`iframe`加载`a.demo.com`，会自动带上`sessionId`
 
-**`a.demo.com`和`b.demo.com`同属一个域名下的子域名**
+**`a.demo.com`和`b.demo.com`同属一个域名下的子域名(<font color="#90B44B">同站</font>)**
 
 5.在`a.demo2.com`域名下，ajax请求`a.demo.com`的api，需要设置`withCredentials`才能带上`sessionId`
 ```javascript
@@ -71,11 +71,15 @@ ajax.get('https://a.demo.com/api/data', {withCredentials: true}) // 自动带上
 
 6.在`a.demo2.com`域名下，使用`iframe`加载`a.demo.com`，会自动带上`sessionId`
 
-**`a.demo.com`和`a.demo2.com`属于完全不相干的两个网站**
+**`a.demo.com`和`a.demo2.com`属于完全不相干的两个网站(<font color="orange">跨站</font>)**
 
 目前为止，都是我们所熟知的cookie携带场景。
 
-然而，在chrome 80版本之后，谷歌把cookie的`SameSite`属性，从`None`改成了`Lax`。<font color="orange">这时候，会导致除了第1和第2种场景，`sessionId`能正常携带，其他场景下，`sessionId`都会丢失！</font>
+然而，在chrome 80版本之后，谷歌把cookie的`SameSite`属性，从`None`改成了`Lax`。<font color="orange">这时候，会导致第5和第6种场景，由于跨站导致`sessionId`丢失！</font>
+
+**跨站解释**
+
+ `a.demo.com`和`b.demo.com`属于同站，`a.demo.com`和`a.demo2.com`属于跨站。注意和`跨域`做比较: `a.demo.com`和`b.demo.com`属于跨域
 
 
 ### SameSite
@@ -89,7 +93,8 @@ cookie的`SameSite`属性用来限制第三方Cookie，从而减少安全风险(
 
 ![](http://pic.deepred5.com/same2.png)
 
-从上图可以看出，`SameSite`从`None`改成了`Lax`后，`Form`,`Iframe`,`Ajax`和`Image`受到的影响最大。
+从上图可以看出，`SameSite`从`None`改成了`Lax`后，`Form`,`Iframe`,`Ajax`和`Image`中<font color="red">**跨站**</font>的请求受到的影响最大。
+
 
 ### 解决方法
 解决方法也很简单粗暴：强行把`SameSite`设置成`None`。不过需要特别注意几点：
