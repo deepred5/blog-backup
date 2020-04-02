@@ -79,7 +79,9 @@ ajax.get('https://a.demo.com/api/data', {withCredentials: true}) // 自动带上
 
 **跨站解释**
 
- `a.demo.com`和`b.demo.com`属于同站，`a.demo.com`和`a.demo2.com`属于跨站。注意和`跨域`做比较: `a.demo.com`和`b.demo.com`属于跨域
+ `a.demo.com`和`b.demo.com`属于同站，`a.demo.com`和`a.demo2.com`属于跨站
+ 
+ 注意和`跨域`做比较: `a.demo.com`和`b.demo.com`属于跨域
 
 
 ### SameSite
