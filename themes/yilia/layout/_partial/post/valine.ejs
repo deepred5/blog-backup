@@ -1,20 +1,46 @@
 <div id="comment"></div>
 <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+<style>
+    .vtext {
+        color: red !important;
+    }
+</style>
 <script>
-new Valine({
-    el: '#comment' ,
-    notify:true, 
-    verify:true, 
-    appId: '<%=theme.valine_appid%>',
-    appKey: '<%=theme.valine_appkey%>',
-    placeholder: 'ヾﾉ≧∀≦)o欢迎评论!',
-    path:window.location.pathname, 
-    avatar:'mm'
-});
+    new Valine({
+        el: '#comment',
+        notify: true,
+        verify: true,
+        appId: '<%=theme.valine_appid%>',
+        appKey: '<%=theme.valine_appkey%>',
+        placeholder: 'ヾﾉ≧∀≦)o欢迎评论!',
+        path: window.location.pathname,
+        avatar: 'mm'
+    });
 </script>
 
 <script>
-    document.body.addEventListener('click', function(e) {
+    function loadJs(src, callback) {
+        const sc = document.createElement('script');
+        sc.type = 'text/javascript';
+        sc.src = src;
+        if (callback) {
+            if (document.addEventListener) {
+                sc.addEventListener("load", callback, false);
+            } else {
+                sc.onreadystatechange = function () {
+                    if (/loaded|complete/.test(sc.readyState)) {
+                        sc.onreadystatechange = null;
+                        callback();
+                    }
+                };
+            }
+        }
+        document.head.appendChild(sc);
+    }
+</script>
+
+<script>
+    document.body.addEventListener('click', function (e) {
         if (e.target.classList.contains('vsubmit')) {
             const email = document.querySelector('input[type=email]');
             const nick = document.querySelector('input[name=nick]');
@@ -25,10 +51,18 @@ new Valine({
                 vmark.innerHTML = str;
                 vmark.style.display = 'block';
 
-                setTimeout(function() {
+                setTimeout(function () {
                     vmark.style.display = 'none';
                     vmark.innerHTML = '';
                 }, 2500);
+            } else {
+                // 使用server酱通知
+                const href = window.location.href;
+                const host = window.location.host;
+                // hexo主题yilia添加valine评论系统 文章被恶意刷屏，无需通知
+                if (href.indexOf('2018/04/05') === -1) {
+                    loadJs(`https://sc.ftqq.com/SCU94700Te32159dab60781a3c638c9ac6389adf55e9d5dec90aa9.send?text=${host}博客有人留言啦~&desp=文章地址是${href}`);
+                }
             }
         }
     });
