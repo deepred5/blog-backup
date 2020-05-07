@@ -33,7 +33,7 @@ p.then((res) => {
 ```
 从上面这段原生`Promise`代码可以看出，如果我们需要自己实现一个`Promise`，需要解决以下几个问题:
 1. `Promise`构造函数的实现
-2. `resolve`和`reject`两个参数是由ES内部提供的，现在需要我们自己代码实现
+2. `resolve`和`reject`两个参数是由JS引擎内部提供的，现在需要我们自己代码实现
 3. `then`方法的链式调用
 
 ```javascript
@@ -101,6 +101,8 @@ class MyPromise {
           onRejected(this.reason);
         })
       })
+
+      // return this;  没啥用
     }
   }
 
@@ -153,7 +155,7 @@ p.then((res) => {
   console.log('res2', res);
 })
 ```
-虽然链式调用实现了，但是不同的`then`方法获取到的`res`对象，永远是同一个值。因此，`then`方法需要返回的是一个全新的`Promise`！
+虽然链式调用实现了，但是不同的`then`方法获取到的`res`对象，永远是同一个值(`"ok"`)。因此，`then`方法需要返回的是一个全新的`Promise`！
 
 ```javascript
 class MyPromise {
@@ -282,10 +284,10 @@ class MyPromise {
   }
 }
 ```
-看完注释，我觉得你应该还是~~<font color="orange">很绕</font>~~。可以通过断点调试理解流程，如果依旧不清晰，不建议继续下文阅读
+看完注释，如果你还是<font color="orange">很绕</font>，可以通过断点调试理清流程。如果还是很懵，<font color="orange">不建议继续阅读之后内容</font>。
 
 <details>
-<summary>强烈建议反复查看这段代码(点击展开)</summary>
+<summary>强烈建议反复体会这段代码(点击展开)</summary>
 ```javascript
 const PENDING = 'pending';
 const FULFILLED = 'fulfilled';
