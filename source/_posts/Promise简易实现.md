@@ -2,6 +2,7 @@
 title: Promise简易实现
 date: 2020-05-07 13:44:00
 tags: [Promise]
+toc: true
 ---
 在[《Promise必知必会》](http://anata.me/2018/08/08/Promise%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A/)一文里，我介绍了`Promise`的基础知识和常用方法。虽然在日常开发中，这些内容已经满足二八定律了，然而在面试中，`写手实现一个Promise`的问题，依旧出现在考官的高频题库里。
 
@@ -51,13 +52,13 @@ class MyPromise {
 
     try {
       // executor是同步执行(new时立刻执行)
-      executor(this.resolve.bind(this), this.reject.bind(this));
+      executor(this._resolve.bind(this), this._reject.bind(this));
     } catch (e) {
-      this.reject(e);
+      this._resolve(e);
     }
   }
 
-  resolve(value) {
+  _resolve(value) {
     if (this.status === PENDING) {
       this.status = FULFILLED;
       this.value = value;
@@ -65,7 +66,7 @@ class MyPromise {
     }
   }
 
-  reject(reason) {
+  _reject(reason) {
     if (this.status === PENDING) {
       this.status = REJECTED;
       this.reason = reason;
@@ -302,13 +303,13 @@ class MyPromise {
     this.reason = '';
 
     try {
-      executor(this.resolve.bind(this), this.reject.bind(this));
+      executor(this._resolve.bind(this), this._reject.bind(this));
     } catch (e) {
       this.reject(e);
     }
   }
 
-  resolve(value) {
+  _resolve(value) {
     if (this.status === PENDING) {
       this.status = FULFILLED;
       this.value = value;
@@ -316,7 +317,7 @@ class MyPromise {
     }
   }
 
-  reject(reason) {
+  _reject(reason) {
     if (this.status === PENDING) {
       this.status = REJECTED;
       this.reason = reason;
@@ -393,3 +394,335 @@ p.then((res) => {
 })
 ```
 </details>
+
+### 支持返回Promise
+前面的代码还是有些问题，如果在`then`方法的成功回调函数里，返回的不是普通对象，而是一个`Promise`对象，我们的代码就无法正常运行了:
+```javascript
+const p = new MyPromise((resolve, reject) => {
+  setTimeout(() => {
+    resolve('ok1')
+  }, 1000);
+});
+
+p.then((res) => {
+  console.log('res1', res);
+  // 返回一个新Promise
+  return new MyPromise((resolve) => {
+    setTimeout(() => {
+      resolve('ok2')
+    }, 1000);
+  });
+}).then((res) => {
+  // 立刻执行，打印的是Promise对象，而不是ok2
+  console.log('res2', res);
+})
+```
+出错的原因
+```javascript
+// x可能是Promise对象，而我们直接resovle了这个Promise对象
+let x = onFulfilled(this.value);
+resolve(x);
+```
+正确的做法
+```javascript
+let x = onFulfilled(this.value);
+if (x instanceof of MyPromise) {
+  // 如果x是Promise对象，则把resolve传递给x.then方法
+  x.then(resolve, reject)
+} else {
+  resovle(x)
+}
+```
+修改后的`then`方法
+```javascript
+then(onFulfilled, onRejected) {
+  const promise2 = new MyPromise((resolve, reject) => {
+    if (this.status === FULFILLED) {
+      setTimeout(() => {
+        try {
+          let x = onFulfilled(this.value);
+          if (x instanceof MyPromise) {
+            x.then(resolve, reject);
+          } else {
+            resolve(x);
+          }
+
+        } catch (e) {
+          reject(e);
+        }
+      })
+    }
+
+    if (this.status === REJECTED) {
+      setTimeout(() => {
+        try {
+          let x = onRejected(this.reason);
+          if (x instanceof MyPromise) {
+            x.then(resolve, reject);
+          } else {
+            resolve(x);
+          }
+        } catch (e) {
+          reject(e);
+        }
+      })
+    }
+
+    if (this.status === PENDING) {
+      this.onFulfilledCallbacks.push(() => {
+        setTimeout(() => {
+          try {
+            let x = onFulfilled(this.value);
+            if (x instanceof MyPromise) {
+              x.then(resolve, reject);
+            } else {
+              resolve(x);
+            }
+          } catch (e) {
+            reject(e);
+          }
+        })
+      })
+
+      this.onRejectedCallbacks.push(() => {
+        setTimeout(() => {
+          try {
+            let x = onRejected(this.reason);
+            if (x instanceof MyPromise) {
+              x.then(resolve, reject);
+            } else {
+              resolve(x);
+            }
+          } catch (e) {
+            reject(e);
+          }
+        })
+      })
+    }
+  });
+
+  return promise2;
+}
+```
+### 支持返回thenable对象
+```javascript
+const p = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve('ok1')
+  }, 1000);
+});
+
+p.then((res) => {
+  console.log('res1', res);
+  // 返回一个thenable对象
+  return {
+    then: function(resolve, reject) {
+      setTimeout(() => {
+        resolve('ok2')
+      }, 1000);
+    }
+  }
+}).then((res) => {
+  console.log('res2', res);
+})
+```
+在`Promise`还没有被`Promises/A+`规范之前，有许多类库实现了自己的`Promise`，比如`jQuery`的`deferred`对象。为了实现`类Promise`的兼容，只要一个对象具有`then`方法，那它就可以被`Promise`识别。
+```javascript
+const thenable =  {
+  then: function (resolve, reject) {
+    setTimeout(() => {
+      resolve('ok2')
+    }, 1000);
+  }
+}
+```
+
+> thenable对象的作用：使promise的实现更具有通用性
+识别thenable或行为类似Promise对象可以根据其是否具有then()方法来判断(鸭子类型)
+
+```javascript
+function isThenable(value) {
+  if (value && (typeof value === 'object' || typeof value === 'function') && typeof value.then === 'function') {
+    return true;
+  }
+
+  return false;
+}
+```
+```javascript
+// 为了判断x是普通对象还是thenable对象(Promise对象也属于thenable对象)，我们可以抽离出一个通用方法resolvePromise
+let x = onFulfilled(this.reason);
+resolvePromise(promise2, x, resolve, reject);
+```
+```javascript
+function resolvePromise(promise2, x, resolve, reject) {
+  // Promise对象或者thenable对象
+  if (x && (typeof x === 'object' || typeof x === 'function') && typeof x.then === 'function') {
+    try {
+      x.then(resolve, reject)
+    } catch (e) {
+      reject(e);
+    }
+  } else {
+    // 其他普通对象
+    resolve(x);
+  }
+}
+```
+### 较完整的Promise
+```javascript
+const PENDING = 'pending';
+const FULFILLED = 'fulfilled';
+const REJECTED = 'rejected';
+
+function isThenable(value) {
+  if (value && (typeof value === 'object' || typeof value === 'function') && typeof value.then === 'function') {
+    return true;
+  }
+
+  return false;
+}
+
+class MyPromise {
+  constructor(executor) {
+    this.status = PENDING;
+    this.onFulfilledCallbacks = [];
+    this.onRejectedCallbacks = [];
+    this.value = '';
+    this.reason = '';
+
+    try {
+      executor(this._resolve.bind(this), this._reject.bind(this));
+    } catch (e) {
+      this._reject(e);
+    }
+  }
+
+  _resolve(value) {
+    // Promise对象或者thenable对象
+    if (isThenable(value)) {
+      return value.then(this._resolve.bind(this), this._reject.bind(this))
+    }
+    if (this.status === PENDING) {
+      this.status = FULFILLED;
+      this.value = value;
+      this.onFulfilledCallbacks.forEach(fn => fn());
+    }
+  }
+
+  _reject(reason) {
+    if (this.status === PENDING) {
+      this.status = REJECTED;
+      this.reason = reason;
+      this.onRejectedCallbacks.forEach(fn => fn());
+    }
+  }
+
+  then(onFulfilled, onRejected) {
+    const promise2 = new MyPromise((resolve, reject) => {
+      if (this.status === FULFILLED) {
+        setTimeout(() => {
+          try {
+            let x = onFulfilled(this.value);
+            resolvePromise(promise2, x, resolve, reject);
+
+          } catch (e) {
+            reject(e);
+          }
+        })
+      }
+
+      if (this.status === REJECTED) {
+        setTimeout(() => {
+          try {
+            let x = onRejected(this.reason);
+            resolvePromise(promise2, x, resolve, reject);
+          } catch (e) {
+            reject(e);
+          }
+        })
+      }
+
+      if (this.status === PENDING) {
+        this.onFulfilledCallbacks.push(() => {
+          setTimeout(() => {
+            try {
+              let x = onFulfilled(this.value);
+              resolvePromise(promise2, x, resolve, reject);
+            } catch (e) {
+              reject(e);
+            }
+          })
+        })
+
+        this.onRejectedCallbacks.push(() => {
+          setTimeout(() => {
+            try {
+              let x = onRejected(this.reason);
+              resolvePromise(promise2, x, resolve, reject);
+            } catch (e) {
+              reject(e);
+            }
+          })
+        })
+      }
+    });
+
+    return promise2;
+  }
+
+}
+
+function resolvePromise(promise2, x, resolve, reject) {
+  // Promise对象或者thenable对象
+  if (isThenable(x)) {
+    try {
+      x.then(resolve, reject)
+    } catch (e) {
+      reject(e);
+    }
+  } else {
+    // 其他普通对象
+    resolve(x);
+  }
+}
+```
+测试一下
+```javascript
+const p = new MyPromise((resolve) => {
+  // 异步resolve
+  setTimeout(() => {
+    resolve('ok1')
+  }, 1000);
+});
+
+p.then((res) => {
+  console.log('res1', res);
+  // 返回thenable对象
+  return {
+    then: function (resolve) {
+      setTimeout(() => {
+        resolve('ok2')
+      }, 1000);
+    }
+  }
+}).then((res) => {
+  console.log('res2', res);
+  // 返回Promise对象
+  return new MyPromise((resolve) => {
+    // resolve一个Promise对象
+    resolve(new MyPromise((resolve) => {
+      setTimeout(() => {
+        resolve('ok3')
+      }, 1000)
+    }))
+  });
+}).then((res) => {
+  console.log('res3', res);
+})
+```
+### 参考
+- [深究Promise的原理及其实现](https://github.com/yonglijia/JSPI/blob/master/How%20to%20implement%20a%20Promise.md)
+- [Promise的源码实现](https://github.com/YvetteLau/Blog/issues/2)
+- [一步一步实现一个Promise](https://github.com/xieranmaya/blog/issues/3)
+- [简单实现Promise](https://imweb.io/topic/5bbc264b6477d81e668cc930)
