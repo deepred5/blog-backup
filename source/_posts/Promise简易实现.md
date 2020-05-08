@@ -674,6 +674,10 @@ class MyPromise {
 }
 
 function resolvePromise(promise2, x, resolve, reject) {
+  if (promise2 === x) {
+    reject(new TypeError('循环引用'));
+  }
+  
   // Promise对象或者thenable对象
   if (isThenable(x)) {
     try {
