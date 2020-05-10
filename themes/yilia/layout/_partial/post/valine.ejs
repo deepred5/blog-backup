@@ -55,6 +55,7 @@
                 vmark.innerHTML = str;
                 vmark.style.display = 'block';
 
+                // 阻止捕获传递下去，否则仍然可以提交评论!!!
                 e.stopPropagation();
 
                 setTimeout(function () {
