@@ -75,13 +75,15 @@ document.body.addEventListener('click', function(e) {
             vmark.innerHTML = str;
             vmark.style.display = 'block';
 
+            e.stopPropagation();
+
             setTimeout(function() {
                 vmark.style.display = 'none';
                 vmark.innerHTML = '';
             }, 2500);
         }
     }
-    });
+    }, true);
 </script>
 
 ```
