@@ -769,6 +769,32 @@ class MyPromise {
       }
     });
   }
+
+  static all(promises) {
+    return new MyPromise((resolve, reject) => {
+      let index = 0;
+      let result = [];
+      if (promises.length === 0) {
+        resolve(result);
+      } else {
+        function processValue(i, data) {
+          result[i] = data;
+          if (++index === promises.length) {
+            resolve(result);
+          }
+        }
+        for (let i = 0; i < promises.length; i++) {
+          MyPromise.resolve(promises[i]).then((data) => {
+            processValue(i, data);
+          }, (err) => {
+            reject(err);
+            return;
+          });
+        }
+      }
+    });
+  }
+  
 }
 ```
 
