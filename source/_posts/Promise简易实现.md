@@ -178,6 +178,7 @@ class MyPromise {
         setTimeout(() => {
           try {
             let x = onRejected(this.reason);
+            // 注意这里是resolve，而不是reject！
             resolve(x);
           } catch (e) {
             reject(e);
