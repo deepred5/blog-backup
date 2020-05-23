@@ -86,6 +86,8 @@ const BILIAPP = {
 
 我们没法直接传函数给原生方法，所以这里只能传回调函数的id，id对应的实际函数，由前端这边维护。
 
+注意：Android端，JS只能传递基本类型数据给原生；iOS端，JS可以传递引用类型给原生。
+
 `sdk.js`
 ```javascript
 let id = 1;
