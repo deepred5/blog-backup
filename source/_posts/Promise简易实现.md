@@ -54,7 +54,7 @@ class MyPromise {
       // executor是同步执行(new时立刻执行)
       executor(this._resolve.bind(this), this._reject.bind(this));
     } catch (e) {
-      this._resolve(e);
+      this._reject(e);
     }
   }
 
