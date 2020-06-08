@@ -54,7 +54,7 @@ class MyPromise {
       // executor是同步执行(new时立刻执行)
       executor(this._resolve.bind(this), this._reject.bind(this));
     } catch (e) {
-      this._resolve(e);
+      this._reject(e);
     }
   }
 
@@ -178,6 +178,7 @@ class MyPromise {
         setTimeout(() => {
           try {
             let x = onRejected(this.reason);
+            // 注意这里是resolve，而不是reject！
             resolve(x);
           } catch (e) {
             reject(e);
