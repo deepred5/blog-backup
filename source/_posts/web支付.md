@@ -62,7 +62,7 @@ app端
 
 在pc端点击支付宝支付，网页新打开一个页面(`window.open()`)，这个页面指向的是支付宝官方收银台页面
 
-![](https://gw.alipayobjects.com/os/skylark-tools/public/files/314978918e1131b82c8df90083d0c7b8.png%26originHeight%3D1285%26originWidth%3D3628%26size%3D615829%26status%3Ddone%26width%3D3628)
+![](http://pic.deepred5.com/314978918e1131b82c8df90083d0c7b8%20.png)
 
 交互方式2:
 
