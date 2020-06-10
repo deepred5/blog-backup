@@ -20,6 +20,8 @@ toc: true
 
 我们先来看看市面上常见网站的收银台：
 
+<!-- more -->
+
 哔哩哔哩会员购:
 
 触屏端
@@ -69,7 +71,7 @@ app端
 
 ![](http://pic.deepred5.com/cashier-aili-qr.png)
 
-b站提供了一个很巧妙的思路：把微信，支付宝，qq三个支付二维码统一成了一个二维码。用户用不同的客户端扫码，都会进入同一个页面（b站实现），这个中转页根据容器环境，判断是调用微信支付还是支付宝支付
+b站提供了一个很巧妙的思路：把微信，支付宝，qq三个支付二维码统一成了一个二维码。用户用不同的客户端扫码，都会进入同一个页面（b站实现），这个中转页根据容器环境，判断是调用微信支付还是支付宝支付(原理后面会[讲解](#JSAPI)，本质是调用不同容器的`JSAPI`)
 
 两种交互方式，点击支付按钮时，其实都是把当前的订单号以及一些相关信息发给后端
 
@@ -217,6 +219,49 @@ ajax({
 
 方法二：微信环境，点击支付宝支付，引导用户使用其他浏览器打开页面
 
+### JSAPI
+如果我们能诱导用户使用支付宝客户端的扫一扫打开我们触屏端的收银台页面，那么其实我们也可以使用支付宝提供的`JSAPI`唤起收银台(**这也是b站实现微信，支付宝，qq同一个二维码都能付款的原理，这三个客户端都提供了自己的`JSAPI`，扫描二维码时，其实进入同一个页面，由这个页面调用`JSAPI`**)
+
+[支付宝H5开放文档](https://myjsapi.alipay.com/jsapi/index.html)
+
+关于`jsbridge`的知识，可以查看我之前的文章[jsbridge初探](http://anata.me/2020/03/04/jsbridge%E5%88%9D%E6%8E%A2/)
+
+`JSAPI`的简单示例
+```javascript
+function ready(callback) {
+  // 如果jsbridge已经注入则直接调用
+  if (window.AlipayJSBridge) {
+    callback && callback();
+  } else {
+    // 如果没有注入则监听注入的事件
+    document.addEventListener('AlipayJSBridgeReady', callback, false);
+  }
+}
+ready(function () {
+  // 显示一个提示框
+  AlipayJSBridge.call('toast', {
+    content: 'hello'
+  });
+});
+```
+唤起收银台需要使用[Alipay JSSDK](https://myjsapi.alipay.com/alipayjsapi/index.html)
+
+```html
+<script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.inc.min.js"></script>
+
+<button id="J_btn" class="btn btn-default">支付</button>
+<script>
+  var btn = document.querySelector('#J_btn');
+  btn.addEventListener('click', function(){
+    ap.tradePay({
+      tradeNO: '201802282100100427058809844'
+    }, function(res){
+      ap.alert(res.resultCode);
+    });
+  });
+</script>
+```
+
 ### app端
 
 现在的app基本都是`Hybrid App`，如果在app端，你的收银台页面不是原生实现的，那么就可以直接使用webview加载触屏端的线上收银台即可
@@ -226,8 +271,6 @@ ajax({
 这是支付宝官网文档建议的，因此如果你希望得到最佳的支付体验，建议客户端的开发同学接入支付宝SDK，当然这部分已经超出了前端的范围
 
 不过一般在app端中，我们仍然使用webview加载触屏端的前端页面，只不过在app中，我们的前端代码，通过`jsbridge`，调用客户端的支付方法即可
-
-关于`jsbridge`的知识，可以查看我之前的文章[jsbridge初探](http://anata.me/2020/03/04/jsbridge%E5%88%9D%E6%8E%A2/)
 
 ```javascript
 const payNum = '123abc';
@@ -249,6 +292,35 @@ APPSDK.invoke('ali_pay', {
 ```
 
 ### 小程序
+
+[小程序唤起支付文档](https://opendocs.alipay.com/mini/api/openapi-pay)
+
+小程序支付和APP支付的支付流程与体验基本一致，可以在当前页面唤起支付宝收银台
+```javascript
+const payNum = '123abc';
+
+my.request({
+  url: 'https://demo.com/api/alipay',// 须加httpRequest域白名单
+  method: 'POST',
+  data: { // data里的key、value是开发者自定义的
+    from: '支付宝',
+    payNum: payNum, // 订单号
+    other: 'demo', // 其他参数
+  },
+  dataType: 'json',
+  success: function(res) {
+    my.alert({content: 'success'});
+  },
+  fail: function(res) {
+    my.alert({content: 'fail'});
+  },
+  complete: function(res) {
+    my.hideLoading();
+    my.alert({content: 'complete'});
+  }
+});
+
+```
 
 ### 支付宝支付小结
 
