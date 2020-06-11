@@ -52,9 +52,11 @@ app端
 
 <font color="#6495ed">注意：本文只考虑前端支付业务的实现，后端支付业务的实现，暂不考虑</font>
 
-## 支付宝
+## 支付宝(花呗分期)
 
 [支付宝开发文档](https://opendocs.alipay.com/open/204/)
+
+花呗分期其实就是支付宝的拓展，原理基本一致，就不重复累赘
 
 ### pc端
 
@@ -71,7 +73,7 @@ app端
 
 ![](http://pic.deepred5.com/cashier-aili-qr.png)
 
-b站提供了一个很巧妙的思路：把微信，支付宝，qq三个支付二维码统一成了一个二维码。用户用不同的客户端扫码，都会进入同一个页面（b站实现），这个中转页根据容器环境，判断是调用微信支付还是支付宝支付(原理后面会[讲解](#JSAPI)，本质是调用不同容器的`JSAPI`)
+b站提供了一个很巧妙的思路：把微信，支付宝，qq三个支付二维码统一成了一个二维码。(原理后面会[讲解](#JSAPI)，本质是调用不同容器的`JSAPI`)
 
 两种交互方式，点击支付按钮时，其实都是把当前的订单号以及一些相关信息发给后端
 
@@ -220,7 +222,9 @@ ajax({
 方法二：微信环境，点击支付宝支付，引导用户使用其他浏览器打开页面
 
 ### JSAPI
-如果我们能诱导用户使用支付宝客户端的扫一扫打开我们触屏端的收银台页面，那么其实我们也可以使用支付宝提供的`JSAPI`唤起收银台(**这也是b站实现微信，支付宝，qq同一个二维码都能付款的原理，这三个客户端都提供了自己的`JSAPI`，扫描二维码时，其实进入同一个页面，由这个页面调用`JSAPI`**)
+如果我们能诱导用户使用支付宝客户端的`扫一扫`打开我们触屏端的收银台页面，那么其实我们也可以使用支付宝提供的`JSAPI`唤起收银台
+
+**这也是b站实现微信，支付宝，qq同一个二维码都能付款的原理，这三个客户端都提供了自己的`JSAPI`，用户用不同的客户端扫码，都会进入同一个页面（b站实现），这个中转页根据容器环境，调用不同`JSAPI`的支付功能**
 
 [支付宝H5开放文档](https://myjsapi.alipay.com/jsapi/index.html)
 
@@ -325,3 +329,164 @@ my.request({
 ### 支付宝支付小结
 
 我们从pc端，触屏端，app端三个方面了解了支付宝支付的基本原理。可以看出：支付的前端实现，其实并不复杂，而真正的难点在于后端支付系统的实现。至于最难的支付宝唤起问题，其实支付宝收银台自身已经实现了唤起功能，无需我们实现
+
+
+## 微信
+
+[微信支付开发文档](https://pay.weixin.qq.com/static/product/product_intro.shtml?name=qrcode)
+
+### pc端
+
+[扫码支付文档](https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=6_1)
+
+交互方式：
+
+由于微信并没有像支付宝一样提供了pc端的官方收银台，所以点击微信支付，我们一般都是直接弹出二维码弹窗，要求用户进行扫码支付。弹出二维码的同时，我们需要立即轮询查询支付状态。
+
+```javascript
+const payNum = '123abc';
+
+ajax({ 
+  url: '/api/weixinpay', // 支付api
+  type: 'POST',
+  data: {
+    payNum: payNum, // 订单号
+    other: 'demo', // 其他参数
+}).then((res) => {
+  const { qrUrl } = res;
+
+  // qrUrl是微信的扫码地址，一般是 weixin://wxpay/bizpayurl?pr=P1oi4x6 ，这段schema通过微信扫一扫可以唤起微信支付
+  qrcode({
+    width: 175,
+    height: 175,
+    url: qrUrl
+  });
+
+  // 开始轮询支付结果
+  // 代码省略，可以参考之前的支付宝pc端实现
+}).catch((err) => {
+  console.log('提交失败')
+})
+```
+
+### 触屏端
+
+[H5支付文档](https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=15_1)
+
+
+交互方式：
+
+在触屏端点击微信支付，页面直接跳转到微信支付中间页，该页面会尝试唤起微信支付
+
+与支付宝收银台不同的是，微信支付中间页在调起微信收银台后超过5秒，会自动跳转会`redirect_url`，因此无法保证页面回跳时，支付流程已结束，所以商户设置的`redirect_url`地址不能自动执行查单操作，应让用户去点击按钮触发查单操作
+
+![](http://pic.deepred5.com/cashier-bili-wx.png)
+
+```javascript
+// 代码省略，基本和支付宝的触屏端一样
+
+// 微信支付中转页一般是这种格式的url地址
+
+// https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb?prepay_id=wx111408048537349a5434e53d1930739300&package=1982317760&redirect_url=https://m.imooc.com/myorder
+```
+
+需要注意：微信支付中转页一般不能直接用浏览器访问，因为中转页需要判断`referer`是否是商户申请H5时提交的授权域名。如果你直接用浏览器访问，`referer`为空，导致页面并不会加载成功。如果是APP里调起H5支付，需要在webview中手动设置`referer`
+
+### JSAPI
+如果我们的收银台页面是在微信浏览器里打开的，那么我们可以使用微信提供的`JSAPI`唤起支付
+
+[JSAPI支付文档](https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7&index=6)
+
+```javascript
+const payNum = '123abc';
+
+function onBridgeReady(wxJsApiParam) {
+    window.WeixinJSBridge.invoke(
+      'getBrandWCPayRequest',
+      wxJsApiParam,//josn串
+      function (res) {
+        if (res.err_msg == "get_brand_wcpay_request:ok") {
+          // 支付成功
+          location.href = `/success/${payNum}`;
+        } else if (res.err_msg == "get_brand_wcpay_request:fail") {
+          // 支付失败
+        }
+      }
+    );
+  }
+
+function weixinPay(wxJsApiParam) {
+    if (typeof WeixinJSBridge == "undefined") {
+      if (document.addEventListener) {
+        document.addEventListener('WeixinJSBridgeReady', function () { onBridgeReady(wxJsApiParam) }, false);
+      } else if (document.attachEvent) {
+        document.attachEvent('WeixinJSBridgeReady', function () { onBridgeReady(wxJsApiParam) });
+        document.attachEvent('onWeixinJSBridgeReady', function () { onBridgeReady(wxJsApiParam) });
+      }
+    } else {
+      onBridgeReady(wxJsApiParam);
+    }
+  }
+
+ajax({ 
+  url: '/api/weixin_jsapi', // 支付api
+  type: 'POST',
+  data: {
+    payNum: payNum, // 订单号
+    other: 'demo', // 其他参数
+}).then((res) => {
+  const { jsapiData } = res;
+  // jsapiData是一串json字符串，里面包含了appId，paySign等各种数据，用来调起微信支付
+  weixinPay(JSON.parse(jsapiData));
+}).catch((err) => {
+  console.log('提交失败')
+})
+```
+
+使用`JSAPI`需要我们有微信公众平台，因为下单必传的参数`openid`，需要我们在公众平台设置获取openid的域名，才能获取成功
+
+除了使用微信浏览器内置的`WeixinJSBridge`对象，我们也可以使用[JSSDK](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html)
+
+```html
+<script src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+<script>
+wx.chooseWXPay({
+  timestamp: 0, 
+  nonceStr: '', 
+  package: '', 
+  signType: '', 
+  paySign: '',
+  success: function (res) {
+    // 支付成功后的回调函数
+  }
+});
+</script>
+```
+
+### app端
+
+[APP支付文档](https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=8_1)
+
+> H5支付不建议在APP端使用，如需要在APP中使用微信支付，请接APP支付
+
+微信官方文档同样不建议在APP端使用触屏端的支付方式，因此最好接入微信SDK。前端同样可以使用`jsbridge`调用客户端的微信支付方法，可以参考前面支付宝的`app端`方式。
+
+### 小程序
+
+[小程序支付文档](https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=7_3&index=1)
+
+小程序支付其实和微信`JSAPI`支付非常类似，都需要先获取到`Openid`，调用相同的API
+
+```javascript
+wx.requestPayment({
+  timeStamp: '',
+  nonceStr: '',
+  package: '',
+  signType: 'MD5',
+  paySign: '',
+  success (res) { },
+  fail (res) { }
+})
+```
+## 参考
+1. [web开发中的支付宝支付和微信支付](https://www.jianshu.com/p/155757d2b9eb)
