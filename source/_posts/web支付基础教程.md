@@ -213,7 +213,7 @@ ajax({
 
 支付成功后，同理支付宝会跳转到`return_url`的地址
 
-需要注意：在微信浏览器里，支付宝是不能被唤起的(~~微信生态圈日常封杀~~)
+需要注意：在微信浏览器里，支付宝是不能被唤起的(~~日常封杀~~)
 
 解决方法：
 
@@ -520,3 +520,17 @@ web支付由于开发条件要求很高(至少要有注册公司)，因此大部
 1. [web开发中的支付宝支付和微信支付](https://www.jianshu.com/p/155757d2b9eb)
 2. [微信支付文档](https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/pages/index.shtml)
 3. [支付宝文档](https://opendocs.alipay.com/open/)
+
+## 拓展
+
+有读者提起了[Payment Request API](https://developer.mozilla.org/en-US/docs/Web/API/Payment_Request_API)这个W3C提供的原生支付api。
+
+> Payment Request API 是一个旨在消灭结账表单的系统。它显著改进了购物流程期间的用户工作流，为用户提供更一致的体验，并让电商公司能够轻松地利用各种完全不同的支付方式。
+
+这个api可以唤起浏览器自带的结算支付页面(原生UI)
+
+![](http://pic.deepred5.com/cashier-native.png)
+
+然而，`PaymentRequest`在Chrome中仅支持以下标准信用卡：`amex`、`diners`、`discover`、`jcb`、`maestro`、`mastercard`、`unionpay`和`visa`。因此结合国情来说，这个API至少在国内来说，其实并不实用。
+
+如果有兴趣，可以查看详细教程[《Payment Request API：集成指南》](https://developers.google.com/web/fundamentals/payments)
