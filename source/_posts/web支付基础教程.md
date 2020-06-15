@@ -531,6 +531,6 @@ web支付由于开发条件要求很高(至少要有注册公司)，因此大部
 
 ![](http://pic.deepred5.com/cashier-native.png)
 
-然而，`PaymentRequest`在Chrome中仅支持以下标准信用卡：`amex`、`diners`、`discover`、`jcb`、`maestro`、`mastercard`、`unionpay`和`visa`。因此结合国情来说，这个API至少在国内来说，其实并不实用。
+然而，`PaymentRequest`在Chrome中仅支持以下标准信用卡：`amex`、`diners`、`discover`、`jcb`、`maestro`、`mastercard`、`unionpay`和`visa`。因此这个API至少在国内来说，其实并不实用。
 
 如果有兴趣，可以查看详细教程[《Payment Request API：集成指南》](https://developers.google.com/web/fundamentals/payments)
