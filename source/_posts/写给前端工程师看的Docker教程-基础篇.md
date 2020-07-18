@@ -203,14 +203,17 @@ docker exec -it my-ubuntu /bin/bash
 大部分情况都是运行守护式容器(daemonized container)
 
 ```bash
-# 启动了容器，然后容器立即关闭
+# 启动了容器，然后容器立即关闭，不再运行
 docker run ubuntu /bin/bash
 
-# 启动了容器，并开启了交互式的终端，只有输入exit才退出终端，退出终端后，容器仍然在后台运行
+# 启动了容器，并开启了交互式的终端，只有输入exit才退出终端，退出终端后，容器停止运行
 docker run -it ubuntu /bin/bash
 
 # 启动了容器，并且在后台一直运行，每隔1s输出hello world
 docker run -d ubuntu /bin/sh -c "while true; do echo hello world; sleep 1; done"
+
+# 启动了容器，然后容器仍然保持运行
+docker run ubuntu tail -f /dev/null 
 ```
 
 **查看容器日志**
