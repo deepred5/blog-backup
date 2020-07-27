@@ -78,14 +78,14 @@ const app = new App({
   middlewares,
 });
 
-app.listen(6666, () => {
-  console.log('app start at: http://localhost:6666');
+app.listen(4445, () => {
+  console.log('app start at: http://localhost:4445');
 })
 ```
 
 `my-node-mvc`暴露了一个`App`类，我们通过传入`routes`和`middlewares`两个参数，来告诉框架如何渲染路由和启动中间件
 
-我们访问`http://localhost:6666`时，首先会经过我们的自定义中间件
+我们访问`http://localhost:4445`时，首先会经过我们的自定义中间件
 ```javascript
 async (next) => {
   console.log('自定义中间件');
@@ -124,7 +124,7 @@ class Home extends Controller {
 module.exports = Home;
 ```
 
-同理访问`http://localhost:6666/list`匹配到了
+同理访问`http://localhost:4445/list`匹配到了
 ```javascript
 {
   match: '/list',
@@ -161,3 +161,128 @@ module.exports = Home
 接下来，我们会一步步实现`my-node-mvc`这个框架
 
 ## 基本框架
+[参考代码-step2](https://github.com/deepred5/build-you-own-node-mvc/tree/master/step2)
+
+`my-node-mvc`是基于`Koa`的，因此首先我们需要安装`Koa`
+
+```bash
+npm i koa
+```
+
+`my-node-mvc/app.js`
+
+```javascript
+const Koa = require('koa');
+
+class App extends Koa {
+  constructor(options={}) {
+    super();
+  }
+}
+
+module.exports = App;
+```
+
+我们只要简单的`extend`继承父类`Koa`即可
+
+`my-node-mvc/index.js`
+
+```javascript
+// 将App导出
+const App = require('./app');
+
+module.exports = {
+  App,
+}
+```
+
+我们来测试下
+```bash
+# 进入step2目录
+cd step2
+node app.js
+```
+访问`http://localhost:4445/`发现服务器启动成功
+
+至此，一个最简单的封装已经完成
+
+## 内置中间件
+我们的`my-node-mvc`框架需要内置一些最基础的中间件，比如`koa-bodyparser`,`koa-router`, `koa-views`等，只有这样，才能免去我们每次新建项目都需要重复安装中间件的麻烦
+
+内置的中间件一般又分为两种：
+
+* 基础中间件：比如`koa-bodyparser`，`koa-router`，`metrics`性能监控，健康检查
+* 业务中间件：框架结合业务需求，把各部门通用的功能集成在业务中间件，比如单点登录，文件上传
+
+```bash
+npm i uuid koa-bodyparser
+```
+
+我们来尝试新建一个业务中间件
+
+`my-node-mvc/middlewares/init.js`
+
+```javascript
+const uuid = require('uuid');
+
+module.exports = () => {
+  // 每次请求生成一个requestId
+  return async (context, next) => {
+    const id = uuid.v4().replace(/-/g, '')
+    context.state.global = {
+      requestId: id
+    }
+    await next()
+  }
+}
+```
+`my-node-mvc/middlewares/index.js`
+
+```javascript
+const init = require('./init');
+const bodyParser = require('koa-bodyparser');
+
+// 把业务中间件init和基础中间件koa-bodyparser导出
+module.exports = {
+  init,
+  bodyParser,
+}
+```
+
+现在，我们需要把这两个中间件在`App`初始化时调用
+
+`my-node-mvc/index.js`
+
+```javascript
+const Koa = require('koa');
+const middlewares = require('./middlewares');
+
+class App extends Koa {
+  constructor(options={}) {
+    super();
+
+    this.initMiddlewares();
+  }
+
+  initMiddlewares() {
+    // 使用this.use注册中间件
+    this.use(middlewares.init())
+    this.use(middlewares.bodyParser());
+  }
+}
+
+module.exports = App;
+```
+
+修改下启动`step2/app.js`
+
+```javascript
+app.use((ctx) => {
+  ctx.body = ctx.state.global.requestId
+})
+
+app.listen(4445, () => {
+  console.log('app start at: http://localhost:4445');
+})
+```
+于是每次访问`http://localhost:4445`都能返回不同的`requestId`
