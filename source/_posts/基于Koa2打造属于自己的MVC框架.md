@@ -59,7 +59,7 @@ module.exports = routes;
 `middlewares/index.js`
 ```javascript
 const middleware = () => {
-  return async (next) => {
+  return async (context, next) => {
     console.log('自定义中间件');
     await next()
   }
@@ -87,7 +87,7 @@ app.listen(4445, () => {
 
 我们访问`http://localhost:4445`时，首先会经过我们的自定义中间件
 ```javascript
-async (next) => {
+async (context, next) => {
   console.log('自定义中间件');
   await next()
 }
@@ -211,8 +211,8 @@ node app.js
 
 内置的中间件一般又分为两种：
 
-* 基础中间件：比如`koa-bodyparser`，`koa-router`，`metrics`性能监控，健康检查
-* 业务中间件：框架结合业务需求，把各部门通用的功能集成在业务中间件，比如单点登录，文件上传
+* 内置基础中间件：比如`koa-bodyparser`，`koa-router`，`metrics`性能监控，健康检查
+* 内置业务中间件：框架结合业务需求，把各部门通用的功能集成在业务中间件，比如单点登录，文件上传
 
 ```bash
 npm i uuid koa-bodyparser
@@ -286,3 +286,78 @@ app.listen(4445, () => {
 })
 ```
 于是每次访问`http://localhost:4445`都能返回不同的`requestId`
+
+## 业务中间件
+
+除了`my-node-mvc`内置的中间件外，我们还能传入自己写的中间件，让`my-node-mvc`帮我们启动
+
+`step2/app.js`
+```javascript
+const { App } = require('./my-node-mvc');
+const routes = require('./routes');
+const middlewares = require('./middlewares');
+
+// 传入我们的业务中间件middlewares，是个数组
+const app = new App({
+  routes,
+  middlewares,
+});
+
+app.use((ctx, next) => {
+  ctx.body = ctx.state.global.requestId
+})
+
+app.listen(4445, () => {
+  console.log('app start at: http://localhost:4445');
+})
+```
+
+`my-node-mvc/index.js`
+
+```javascript
+const Koa = require('koa');
+const middlewares = require('./middlewares');
+
+class App extends Koa {
+  constructor(options={}) {
+    super();
+    this.options = options;
+
+    this.initMiddlewares();
+  }
+
+  initMiddlewares() {
+    // 接收传入进来的业务中间件
+    const { middlewares: businessMiddlewares } = this.options;
+    // 使用this.use注册中间件
+    this.use(middlewares.init())
+    this.use(middlewares.bodyParser());
+
+    // 初始化业务中间件
+    businessMiddlewares.forEach(m => {
+      if (typeof m === 'function') {
+        this.use(m);
+      } else {
+        throw new Error('中间件必须是函数');
+      }
+    });
+  }
+}
+
+module.exports = App;
+```
+
+于是我们的业务中间件也能启动成功了
+
+`step2/middlewares/index.js`
+
+```javascript
+const middleware = () => {
+  return async (context, next) => {
+    console.log('自定义中间件');
+    await next()
+  }
+}
+
+module.exports = [middleware()];
+```
