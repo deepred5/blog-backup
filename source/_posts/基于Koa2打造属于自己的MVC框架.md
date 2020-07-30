@@ -361,3 +361,61 @@ const middleware = () => {
 
 module.exports = [middleware()];
 ```
+
+## 添加全局方法
+
+我们知道，`Koa`内置的对象`ctx`上已经挂载了很多方法，比如`ctx.cookies.get()` `ctx.remove()`等等，在我们的`my-node-mvc`框架里，我们其实还能继续添加一些全局方法
+
+如何在`ctx`上继续添加方法呢？ 常规的思路是写一个中间件，把方法挂载在`ctx`上：
+
+```javascript
+const utils = () => {
+  return async (context, next) => {
+    context.sayHello = () => {
+      console.log('hello');
+    }
+    await next()
+  }
+}
+
+// 使用中间件
+app.use(utils());
+
+// 之后的中间件都能使用这个方法了
+app.use((ctx, next) => {
+  ctx.sayHello();
+})
+```
+
+不过这要求我们将`utils`中间件放在最顶层，这样之后的中间件才能继续使用这个方法
+
+我们可以换个思路：每次客户端发送一个http请求，`Koa`都会调用`createContext`方法，该[方法](https://github.com/koajs/koa/blob/master/lib/application.js#L177)会返回一个全新的`ctx`，之后这个`ctx`会被传递到各个中间件里
+
+关键点就在`createContext`，我们可以重写`createContext`方法，在把`ctx`传递给中间件之前，就先注入我们的全局方法
+
+`my-node-mvc/index.js`
+
+```javascript
+const Koa = require('koa');
+
+class App extends Koa {
+  
+  createContext(req, res) {
+    // 调用父级方法
+    const context = super.createContext(req, res);
+    // 注入全局方法
+    this.injectUtil(context);
+
+    // 返回ctx
+    return context
+  }
+
+  injectUtil(context) {
+    context.sayHello = () => {
+      console.log('hello');
+    }
+  }
+}
+
+module.exports = App;
+```
