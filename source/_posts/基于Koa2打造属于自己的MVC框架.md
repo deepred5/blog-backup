@@ -251,7 +251,7 @@ module.exports = {
 }
 ```
 
-现在，我们需要把这两个中间件在`App`初始化时调用
+现在，我们需要把这几个中间件在`App`初始化时调用
 
 `my-node-mvc/index.js`
 
@@ -571,7 +571,7 @@ router[method].apply(router, args)
 
 ## 注入Controller
 
-前面的路由中间件，我们还缺少最重要的一步：找到对应的Controller对象
+前面的路由中间件，我们还缺少最关键的一步：找到对应的Controller对象
 
 ```javascript
 controller && args.push(async (context, next) => {
