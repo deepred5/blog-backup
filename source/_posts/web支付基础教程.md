@@ -530,11 +530,6 @@ web支付由于开发条件要求很高(至少要有注册公司)，因此大部
 
 真正实际项目里，我们仍然会面临很多问题和难点，这时就需要我们见招拆招了。
 
-## 参考
-1. [web开发中的支付宝支付和微信支付](https://www.jianshu.com/p/155757d2b9eb)
-2. [微信支付文档](https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/pages/index.shtml)
-3. [支付宝文档](https://opendocs.alipay.com/open/)
-
 ## 拓展
 
 有读者提起了[Payment Request API](https://developer.mozilla.org/en-US/docs/Web/API/Payment_Request_API)这个W3C提供的原生支付api。
@@ -548,3 +543,9 @@ web支付由于开发条件要求很高(至少要有注册公司)，因此大部
 然而，`PaymentRequest`在Chrome中仅支持以下标准信用卡：`amex`、`diners`、`discover`、`jcb`、`maestro`、`mastercard`、`unionpay`和`visa`。因此这个API至少在国内来说，其实并不实用。
 
 如果有兴趣，可以查看详细教程[《Payment Request API：集成指南》](https://developers.google.com/web/fundamentals/payments)
+
+## 参考
+1. [web开发中的支付宝支付和微信支付](https://www.jianshu.com/p/155757d2b9eb)
+2. [微信支付文档](https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/pages/index.shtml)
+3. [支付宝文档](https://opendocs.alipay.com/open/)
+4. [支付渠道路由系统进化史](https://www.cnblogs.com/goodAndyxublog/p/10848843.html)
