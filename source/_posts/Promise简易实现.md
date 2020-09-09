@@ -427,7 +427,7 @@ resolve(x);
 正确的做法
 ```javascript
 let x = onFulfilled(this.value);
-if (x instanceof of MyPromise) {
+if (x instanceof MyPromise) {
   // 如果x是Promise对象，则把resolve传递给x.then方法，resovle何时调用让x做决定
   x.then(resolve, reject)
 } else {
