@@ -239,7 +239,7 @@ b. API 问题
 // 新版
 <TextArea autoSize={{ minRows: 5 }} />
 ```
-这种api的变化，只能靠人工修改和页面报错来修改了。。。
+这种api的变化，只能靠人工编码和页面报错来修复了。。。
 
 c. antd4 自身的bug
 
