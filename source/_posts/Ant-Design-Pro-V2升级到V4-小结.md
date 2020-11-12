@@ -6,11 +6,11 @@ toc: true
 ---
 
 ### 前言
-前不久接手过一个历史悠久的项(shi)目(shan)，技术栈之复杂(~~混乱~~)令我叹为观止：你甚至可以在一个项目里使用前端三大框架(Angular1, Vue, React)。
+前不久接手过一个历史悠久的项(shi)目(shan)，技术栈之复杂(~~混乱~~)令我潸然泪下：你甚至可以在一个项目里使用前端三大框架(Angular1, Vue, React)。
 
 > 三份的快乐，本应该给我带来更多的快乐，但是为什么会变成这样呢?
 
-鉴于接到的是一个全新的需求，于是我又双叒叕引入了`Ant Design Pro V4`全家桶(**第四份的快乐**)。`Hooks`和`Ant Design V4`的搭配，的确用着很香，尤其是`Form`表单的重写，大大提高了开发效率。于是趁着空闲时间，我决定把负责的一个`Ant Design Pro V2`项目也升级到`V4`版本。
+鉴于接到的是一个全新的需求，于是我又双叒叕引入了`Ant Design Pro V4`全家桶(**第四份的快乐**)。`Hooks`和`Ant Design V4`的搭配，的确用着很香，尤其是`Form`表单的重写，大大提高了开发效率。于是趁着空闲时间，我决定把一个自己负责的`Ant Design Pro V2`项目也升级到`V4`版本。
 
 特此记录下升级过程。
 
@@ -18,7 +18,7 @@ toc: true
 
 ### UMI3升级
 
-我当时使用的是[ant-design-pro 2.2.0 脚手架](https://github.com/ant-design/ant-design-pro/tree/2.2.0) 生成的前端项目，使用的是`umi@2`和`antd@3`版本。因此，首先把`UMI`升级到最新的`V3`版本。
+我当时使用的是[ant-design-pro 2.2.0 脚手架](https://github.com/ant-design/ant-design-pro/tree/2.2.0) 生成的前端项目(JS版，非TS版)，使用的是`umi@2`和`antd@3`。因此，首先要把`UMI`升级到最新的`V3`版本。
 
 参考官方文档:
 1. [《快速升级到 umi@3》](https://pro.ant.design/docs/upgrade-umi3-cn)
@@ -108,13 +108,7 @@ export default defineConfig({
   cssLoader: {
     // 这里的 modules 可以接受 getLocalIdent
     modules: {
-      getLocalIdent:(
-        context: {
-          resourcePath: string;
-        },
-        _: string,
-        localName: string,
-      ) => {
+      getLocalIdent: (context, localIdentName, localName) => {
         if (
           context.resourcePath.includes('node_modules') ||
           context.resourcePath.includes('ant.design.pro.less') ||
@@ -127,8 +121,8 @@ export default defineConfig({
           const antdProPath = match[1].replace('.less', '');
           const arr = winPath(antdProPath)
             .split('/')
-            .map((a: string) => a.replace(/([A-Z])/g, '-$1'))
-            .map((a: string) => a.toLowerCase());
+            .map(a => a.replace(/([A-Z])/g, '-$1'))
+            .map(a => a.toLowerCase());
           return `antd-pro${arr.join('-')}-${localName}`.replace(/--/g, '-');
         }
         return localName;
@@ -183,3 +177,84 @@ e. 重新启动项目
 `npm run start` 理论上，项目应该能够被`umi3`启动起来了。
 
 如果仍然报错，则自行根据报错原因修改代码即可。
+
+
+### Ant Design Pro 内置组件升级
+
+`Ant Design Pro v2`脚手架提供的`Layout`组件，已被抽离成了一个单独的npm包`@ant-design/pro-layout`。同时官方又封装了几个常用的组件，方便快速进行业务开发，详见[ProComponents官网](https://procomponents.ant.design/)。
+
+不过我原项目中的`Layout`组件功能暂时够用，考虑到代码改动较大，因此暂时没有升级该组件。
+
+
+### Ant Design 4 升级
+
+参考官方文档: [《从 v3 到 v4》](https://ant.design/docs/react/migration-v4-cn)
+
+a. `antd`升级到`3.x`最新版本（前面我们已经在升级`umi3`的过程升级了`antd`），按照控制台 warning 信息移除/修改相关的 API
+
+b. 升级项目 React 16.12.0 以上  `npm i react@^16.12.0`
+
+重新运行项目，查看是否能正确运行
+
+c. 使用命令行工具快速升级
+
+由于`antd4`重构了大量的组件，为了兼容已有`antd2`废弃的组件(比如旧版本的`Form`)，官方提供了`@ant-design/compatible`这个npm包
+
+```javascript
+import { Form, Mention } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+```
+
+官方提供了一个cli工具，可以自动转换代码的引入方式。**在运行cli前，请先提交你的本地代码修改**。
+
+```bash
+# 进入旧项目
+cd myproject
+# 通过 npx 直接运行
+# src 就是前端源代码目录夹
+npx -p @ant-design/codemod-v4 antd4-codemod src
+```
+对于无法自动修改的部分，codemod 会在命令行进行提示，建议按提示手动修改。修改后可以反复运行上述命令进行检查。
+
+d. 升级`antd`版本
+
+`npm i antd@^4.0.0  @ant-design/icons@^4.0.0   @ant-design/compatible@^1.0.0`
+
+安装成功后，重启项目，查看页面效果。
+
+### 升级后的问题
+
+a. 样式问题
+
+升级后的的历史代码，`Form`组件引用的是`@ant-design/compatible`，class类名发生了变化，从`ant-form`变成了`ant-legacy-form`。如果你的项目里对这部分的样式进行了修改，则需要手动修改类名了。
+
+样式问题只能靠自己一个个页面去排查了。。。
+
+b. API 问题
+
+```jsx
+// 旧版
+<TextArea autosize={{ minRows: 5 }} />
+
+// 新版
+<TextArea autoSize={{ minRows: 5 }} />
+```
+这种api的变化，只能靠人工修改和页面报错来修改了。。。
+
+c. antd4 自身的bug
+
+比如[RangePicker属性defaultPickerValue无效](https://github.com/ant-design/ant-design/issues/21811)
+
+升级有风险，挖坑需谨慎!
+
+### 总结
+
+此次升级的过程比我预想的要轻松很多，不过也是在项目页面不多(只有20多个页面)，初期底层框架由我搭建(系统较熟悉)的前提下完成的。
+
+前言中我有提到的那个历史遗留的巨石应用，其实已经在一个岌岌可危，即将不可维护的状态下了。即使我又引入了最新的技术栈，然而若干年后，接手的人员肯定会吐槽：`Antd pro 4` 这版本也太老了吧！
+
+市面上这几年也提出了[微前端](https://micro-frontends.org/)的概念，相应的微前端框架[single-spa](https://github.com/single-spa/single-spa)，[qiankun](https://qiankun.umijs.org/zh/guide)也应运而生。
+
+看着手里维护的各种技术栈的代码，我想起了一句名言：
+
+> 世上本没有微前端，吹的人多了，也便成了KPI。老夫写代码都是jQuery一把梭！ ——— 鲁迅
