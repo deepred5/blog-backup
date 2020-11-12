@@ -243,7 +243,7 @@ b. API 问题
 
 c. antd4 自身的bug
 
-比如[RangePicker属性defaultPickerValue无效](https://github.com/ant-design/ant-design/issues/21811)
+比如 [RangePicker属性defaultPickerValue无效](https://github.com/ant-design/ant-design/issues/21811)
 
 升级有风险，挖坑需谨慎!
 
