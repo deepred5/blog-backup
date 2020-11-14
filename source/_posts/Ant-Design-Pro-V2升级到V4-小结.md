@@ -241,7 +241,7 @@ b. API 问题
 ```
 这种api的变化，只能靠人工编码和页面报错来修复了。。。
 
-c. antd4 自身的bug
+c. Antd4 自身的bug
 
 比如 [RangePicker属性defaultPickerValue无效](https://github.com/ant-design/ant-design/issues/21811)
 
