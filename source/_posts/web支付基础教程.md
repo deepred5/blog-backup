@@ -423,6 +423,8 @@ window.location.href = schema;
 ### JSAPI
 如果我们的收银台页面是在微信浏览器里打开的，那么我们可以使用微信提供的`JSAPI`唤起支付
 
+`JSAPI` 支付又称公众号支付
+
 [JSAPI支付文档](https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7&index=6)
 
 ```javascript
@@ -490,6 +492,11 @@ wx.chooseWXPay({
 });
 </script>
 ```
+
+**2020.11.15 更新**
+由于微信推出了一个所谓的[《点金计划》](https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/goldplan/chapter1_1.shtml)，因此如果你的`JSAPI`后端对接的不是微信直连渠道，而是第三方支付渠道(比如[易宝支付](https://www.yeepay.com/))，那么支付成功后，不会调用回调函数，而是直接进入微信的官方小票页面(取决于你的服务商有没有给你打开点金计划，若没有则直接关闭支付页)
+
+更多详情请见[《微信点金计划商家小票对接踩坑记录》](https://developers.weixin.qq.com/community/develop/article/doc/0002e816648fe0e42b2b4305a53c13)
 
 ### app端
 
