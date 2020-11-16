@@ -188,7 +188,10 @@ e. 重新启动项目
 
 ### Ant Design 4 升级
 
-参考官方文档: [《从 v3 到 v4》](https://ant.design/docs/react/migration-v4-cn)
+参考官方文档: 
+
+1. [《从 v3 到 v4》](https://ant.design/docs/react/migration-v4-cn)
+2. [《迁移 antd@4 指南》](https://beta-pro.ant.design/blog/antd-4.0-cn)
 
 a. `antd`升级到`3.x`最新版本（前面我们已经在升级`umi3`的过程升级了`antd`），按照控制台 warning 信息移除/修改相关的 API
 
