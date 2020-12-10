@@ -590,7 +590,7 @@ function setup() {
   TweenMax.to(bili, 1, { y: 100, delay: 3 });
 }
 ```
-其实[PIXI.Application](https://github.com/pixijs/pixi.js/blob/dev/packages/app/src/Application.js)的底层就是帮我们简化了上述的操作。
+其实[PIXI.Application](https://github.com/pixijs/pixi.js/blob/dev/packages/app/src/Application.ts)的底层就是帮我们简化了上述的操作。
 
 ## 参考
 [Pixi教程中文版](https://github.com/Zainking/LearningPixi)
