@@ -55,7 +55,7 @@ Content-Range: bytes 3145728-4194303/25641810
 
 断点续传和本文接下来将要介绍的视频分段下载，就需要使用这个状态码
 
-### Blob
+### Object URL
 我们先来看看市面上各大视频网站是如何播放视频?
 
 哔哩哔哩:
@@ -72,7 +72,15 @@ Content-Range: bytes 3145728-4194303/25641810
 2. 浏览器无法直接在地址栏访问
 3. 即使是同一个视频，每次新打开页面，生成的地址都是不同的
 
-其实，这个地址是通过[URL.createObjectURL](https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL)生成的
+其实，这个地址是通过[URL.createObjectURL](https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL)生成的`Object URL`
+
+```javascript
+const obj = {name: 'deepred'};
+const blob = new Blob([JSON.stringify(obj)], {type : 'application/json'});
+const objectURL = URL.createObjectURL(blob);
+
+console.log(objectURL); // blob:https://anata.me/06624c66-be01-4ec5-a351-84d716eca7c0
+```
 
 
 ### 参考
