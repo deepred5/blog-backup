@@ -22,8 +22,8 @@ toc: true
 
 理想状态下，我们希望的播放效果是：
 1. 边播放，边下载，实现视频的分段下载和播放(**流媒体**)
-2. 视频码率的无缝切换
-3. 隐藏真实的视频访问地址，防止盗链和下载
+2. 视频码率的无缝切换(**DASH**)
+3. 隐藏真实的视频访问地址，防止盗链和下载(**Object URL**)
 
 在这种情况下，普通的`video`标签就无法满足需求了
 
@@ -112,7 +112,7 @@ blob.size; // 属性
 blob.text().then(res => console.log(res)) // 方法
 ```
 
-### 图片预览
+### Object URL的使用
 ```html
 <input id="upload" type="file" />
 <img id="preview" alt="预览" />
@@ -133,6 +133,41 @@ upload.addEventListener('change', () => {
 
 图片地址是不是很熟悉？和我们看到的各大视频网站的视频加载地址，格式如出一辙
 
+同理，如果我们用`video`加载`Object URL`，是不是就能播放视频了？
+
+```html
+<video controls width="800"></video>
+```
+```javascript
+function fetchVideo(url) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url);
+    xhr.responseType = 'blob'; // 文件类型设置成blob
+    xhr.onload = function() {
+      resolve(xhr.response);
+    };
+    xhr.onerror = function () {
+      reject(xhr);
+    };
+    xhr.send();
+  })
+}
+
+async function init() {
+  const res = await fetchVideo('./demo.mp4');
+  const url = URL.createObjectURL(res);
+  document.querySelector('video').src = url;
+}
+
+init();
+```
+`video`标签的确能够正常播放视频，但我们使用了`ajax`异步请求了全部的视频数据，这和直接使用`video`加载原始视频相比，并无优势
+
+### 流媒体
+
+
+
 ### 参考
 * [为什么视频网站的视频链接地址是blob？](https://juejin.cn/post/6844903880774385671)
 * [从天猫某活动视频不必要的3次请求说起](https://www.zhangxinxu.com/wordpress/2018/12/video-moov-box/)
@@ -141,3 +176,4 @@ upload.addEventListener('change', () => {
 * [Web 视频播放的那些事儿](https://zhuanlan.zhihu.com/p/126673473)
 * [Building a simple MPEG-DASH streaming player](https://msdn.microsoft.com/zh-cn/library/windows/apps/dn551368.aspx)
 * [前端视频直播技术总结及video.js在h5页面中的应用](https://www.cnblogs.com/dreamsqin/p/12557070.html)
+* [流媒体协议的认识](https://www.xiaotaotao.vip/2019/11/28/%E6%B5%81%E5%AA%92%E4%BD%93%E5%8D%8F%E8%AE%AE%E7%9A%84%E8%AE%A4%E8%AF%86/)
