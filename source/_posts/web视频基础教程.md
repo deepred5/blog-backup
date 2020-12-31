@@ -135,9 +135,11 @@ upload.addEventListener('change', () => {
 
 同理，如果我们用`video`加载`Object URL`，是不是就能播放视频了？
 
+`index.html`
 ```html
 <video controls width="800"></video>
 ```
+`demo.js`
 ```javascript
 function fetchVideo(url) {
   return new Promise((resolve, reject) => {
@@ -162,11 +164,155 @@ async function init() {
 
 init();
 ```
-`video`标签的确能够正常播放视频，但我们使用了`ajax`异步请求了全部的视频数据，这和直接使用`video`加载原始视频相比，并无优势
 
-### Fragmented MP4
+文件目录如下:
+```bash
+├── demo.mp4
+├── index.html
+├── demo.js
+```
+使用`http-server`简单启动一个服务器
+```bash
+npm i http-server -g
 
+http-server -p 4444 -c-1
+```
 
+访问`http://127.0.0.1:4444/`,`video`标签的确能够正常播放视频，但我们使用了`ajax`异步请求了全部的视频数据，这和直接使用`video`加载原始视频相比，并无优势
+
+### Media Source Extensions
+结合前面介绍的`206`状态码，我们能不能通过`ajax`请求部分的视频片段(segments)，先缓冲到`video`标签里，然后当视频即将播放结束前，继续下载部分视频，实现分段播放呢？
+
+答案当然是肯定的，但是我们不能直接使用`video`加载原始分片数据，而是要通过 [MediaSource](https://developer.mozilla.org/en-US/docs/Web/API/MediaSource) API
+
+需要注意的是，普通的mp4格式文件，是无法通过`MediaSource`进行加载的，需要我们使用一些转码工具，将普通的mp4转换成fmp4([Fragmented MP4](https://stackoverflow.com/questions/35177797/what-exactly-is-fragmented-mp4fmp4-how-is-it-different-from-normal-mp4/35180327#35180327))。为了简单演示，我们这里不使用实时转码，而是直接通过[MP4Box](https://www.videohelp.com/software/MP4Box)工具，直接将一个完整的mp4转换成fmp4
+
+```bash
+#### 每4s分割1段
+mp4box -dash 4000 demo.mp4
+```
+运行命令，会生成一个`demo_dashinit.mp4`视频文件和一个`demo_dash.mpd`配置文件。其中`demo_dashinit.mp4`就是被转码后的文件，这次我们可以使用`MediaSource`进行加载了
+
+文件目录如下:
+```bash
+├── demo.mp4
+├── demo_dashinit.mp4
+├── demo_dash.mpd
+├── index.html
+├── demo.js
+```
+`index.html`
+```html
+<video width="600" controls></video>
+```
+`demo.js`
+```javascript
+class Demo {
+  constructor() {
+    this.video = document.querySelector('video');
+    this.baseUrl = '/demo_dashinit.mp4';
+    this.mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
+
+    this.mediaSource = null;
+    this.sourceBuffer = null;
+
+    this.init();
+  }
+
+  init = () => {
+    if ('MediaSource' in window && MediaSource.isTypeSupported(this.mimeCodec)) {
+      const mediaSource = new MediaSource();
+      this.video.src = URL.createObjectURL(mediaSource); // 返回object url
+      this.mediaSource = mediaSource;
+      mediaSource.addEventListener('sourceopen', this.sourceOpen); // 监听sourceopen事件
+    } else {
+      console.error('不支持MediaSource');
+    }
+  }
+
+  sourceOpen = async () => {
+    const sourceBuffer = this.mediaSource.addSourceBuffer(this.mimeCodec); // 返回sourceBuffer
+    this.sourceBuffer = sourceBuffer;
+    const start = 0;
+    const end = 1024 * 1024 * 5 - 1; // 加载视频开头的5M数据。如果你的视频文件很大，5M也许无法启动视频，可以适当改大点
+    const range = `${start}-${end}`;
+    const initData = await this.fetchVideo(range);
+    this.sourceBuffer.appendBuffer(initData);
+
+    this.sourceBuffer.addEventListener('updateend', this.updateFunct, false);
+  }
+
+  updateFunct = () => {
+    
+  }
+
+  fetchVideo = (range) => {
+    const url = this.baseUrl;
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url);
+      xhr.setRequestHeader("Range", "bytes=" + range); // 添加Range头
+      xhr.responseType = 'arraybuffer';
+
+      xhr.onload = function (e) {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          return resolve(xhr.response);
+        }
+        return reject(xhr);
+      };
+
+      xhr.onerror = function () {
+        reject(xhr);
+      };
+      xhr.send();
+    })
+  }
+}
+
+const demo = new Demo()
+```
+我们这次只请求了视频的前5M数据，可以看到，视频能够成功播放几秒，然后画面就卡住了。
+
+![video-load](http://pic.deepred5.com/video-load.gif)
+
+接下来我们要做的就是，监听视频的播放时间，如果缓冲数据即将不够时，就继续下载下一个5M数据
+
+```javascript
+class Demo {
+
+  updateFunct = () => {
+    // updateend只监听一次
+    // 视频开始播放后，监听视频的timeupdate来决定是否继续请求数据
+    this.sourceBuffer.removeEventListener("updateend", this.updateFunct);
+    this.bindVideoEvent();
+  }
+
+  bindVideoEvent = () => {
+    this.video.addEventListener("timeupdate", this.timeupdate, false);
+  }
+
+  timeupdate = async () => {
+    const timeEnough = this.isTimeEnough();
+
+    if (!timeEnough) {
+      // 继续加载分段视频
+    }
+  }
+
+  isTimeEnough = () => {
+    // 当前缓冲数据是否足够播放
+    for (let i = 0; i < this.video.buffered.length; i++) {
+      const bufferend = this.video.buffered.end(i);
+      if (this.video.currentTime < bufferend && bufferend - this.video.currentTime >= 3) // 提前3s下载视频
+        return true
+    }
+    return false;
+  }
+}
+
+const demo = new Demo()
+```
+更详细的分段加载过程，见[完整代码](https://github.com/deepred5/media-source-demo)
 
 
 ### 参考
