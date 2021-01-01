@@ -17,11 +17,11 @@ toc: true
 的确，一个简单的`video`标签就可以轻松实现视频播放功能
 
 但是，当视频的文件很大时，使用`video`的播放效果就不是很理想:
-1. 播放不流畅(尤其在：**首次初始化视频，拖动时间轴播放** 场景时卡顿非常明显)
-2. 浪费带宽，如果用户仅仅观看了一个视频的前几秒，可能已经被提前下载了几十兆流量了。**即浪费了用户的流量，也浪费了公司服务器的下行带宽**
+1. 播放不流畅(尤其在：**首次初始化视频** 场景时卡顿非常明显)
+2. 浪费带宽，如果用户仅仅观看了一个视频的前几秒，可能已经被提前下载了几十兆流量了。**即浪费了用户的流量，也浪费了服务器的昂贵带宽**
 
 理想状态下，我们希望的播放效果是：
-1. 边播放，边下载，实现视频的分段下载和播放(**流媒体**)
+1. 边播放，边下载(**渐进式下载**)，无需一次性下载视频(**流媒体**)
 2. 视频码率的无缝切换(**DASH**)
 3. 隐藏真实的视频访问地址，防止盗链和下载(**Object URL**)
 
@@ -35,7 +35,7 @@ toc: true
   <source src="demo.mp4" type="video/mp4">
 </video>
 ```
-我们播放`demo.mp4`视频时，浏览器其实已经做过了部分优化，并不会等待视频全部下载完成后才开始播放，而是先请求部分数据(如果我们希望更加精确的分段下载，则需要使用`Media Source Extensions`)
+我们播放`demo.mp4`视频时，浏览器其实已经做过了部分优化，并不会等待视频全部下载完成后才开始播放，而是先请求部分数据
 
 ![206](http://pic.deepred5.com/206.png)
 
@@ -112,7 +112,7 @@ blob.size; // 属性
 blob.text().then(res => console.log(res)) // 方法
 ```
 
-### Object URL的使用
+### Object URL的应用
 ```html
 <input id="upload" type="file" />
 <img id="preview" alt="预览" />
@@ -130,8 +130,6 @@ upload.addEventListener('change', () => {
 `createObjectURL`返回的`Object URL`直接通过`img`进行加载，即可实现前端的图片预览功能
 
 ![blob-pre](http://pic.deepred5.com/blob-pre.png)
-
-图片地址是不是很熟悉？和我们看到的各大视频网站的视频加载地址，格式如出一辙
 
 同理，如果我们用`video`加载`Object URL`，是不是就能播放视频了？
 
@@ -171,14 +169,14 @@ init();
 ├── index.html
 ├── demo.js
 ```
-使用`http-server`简单启动一个服务器
+使用`http-server`简单启动一个静态服务器
 ```bash
 npm i http-server -g
 
 http-server -p 4444 -c-1
 ```
 
-访问`http://127.0.0.1:4444/`,`video`标签的确能够正常播放视频，但我们使用了`ajax`异步请求了全部的视频数据，这和直接使用`video`加载原始视频相比，并无优势
+访问`http://127.0.0.1:4444/`,`video`标签的确能够正常播放视频，但我们使用`ajax`异步请求了全部的视频数据，这和直接使用`video`加载原始视频相比，并无优势
 
 ### Media Source Extensions
 结合前面介绍的`206`状态码，我们能不能通过`ajax`请求部分的视频片段(segments)，先缓冲到`video`标签里，然后当视频即将播放结束前，继续下载部分视频，实现分段播放呢？
@@ -271,6 +269,14 @@ class Demo {
 
 const demo = new Demo()
 ```
+
+![mse](http://pic.deepred5.com/mse.jpg)
+
+实现原理：
+1. 通过请求头`Range`拉取数据
+2. 将数据喂给`sourceBuffer`，`MediaSource`对数据进行解码处理
+3. 通过`video`进行播放
+
 我们这次只请求了视频的前5M数据，可以看到，视频能够成功播放几秒，然后画面就卡住了。
 
 ![video-load](http://pic.deepred5.com/video-load.gif)
@@ -278,39 +284,15 @@ const demo = new Demo()
 接下来我们要做的就是，监听视频的播放时间，如果缓冲数据即将不够时，就继续下载下一个5M数据
 
 ```javascript
-class Demo {
-
-  updateFunct = () => {
-    // updateend只监听一次
-    // 视频开始播放后，监听视频的timeupdate来决定是否继续请求数据
-    this.sourceBuffer.removeEventListener("updateend", this.updateFunct);
-    this.bindVideoEvent();
+const isTimeEnough = () => {
+  // 当前缓冲数据是否足够播放
+  for (let i = 0; i < this.video.buffered.length; i++) {
+    const bufferend = this.video.buffered.end(i);
+    if (this.video.currentTime < bufferend && bufferend - this.video.currentTime >= 3) // 提前3s下载视频
+      return true
   }
-
-  bindVideoEvent = () => {
-    this.video.addEventListener("timeupdate", this.timeupdate, false);
-  }
-
-  timeupdate = async () => {
-    const timeEnough = this.isTimeEnough();
-
-    if (!timeEnough) {
-      // 继续加载分段视频
-    }
-  }
-
-  isTimeEnough = () => {
-    // 当前缓冲数据是否足够播放
-    for (let i = 0; i < this.video.buffered.length; i++) {
-      const bufferend = this.video.buffered.end(i);
-      if (this.video.currentTime < bufferend && bufferend - this.video.currentTime >= 3) // 提前3s下载视频
-        return true
-    }
-    return false;
-  }
+  return false
 }
-
-const demo = new Demo()
 ```
 
 当然我们还有很多问题需要考虑，例如:
@@ -319,7 +301,23 @@ const demo = new Demo()
 3. 兼容性问题
 4. 更多细节。。。。
 
-更详细的分段加载过程，见[完整代码](https://github.com/deepred5/media-source-demo)
+详细分段下载过程，见[完整代码](https://github.com/deepred5/media-source-demo)
+
+### 流媒体协议
+视频服务一般分为：
+1. 点播
+2. 直播
+
+不同的服务，选择的流媒体协议也各不相同。主流的协议有: RTMP、HTTP-FLV、HLS、DASH、webRTC等等，详见[《流媒体协议的认识》](https://www.xiaotaotao.vip/2019/11/28/%E6%B5%81%E5%AA%92%E4%BD%93%E5%8D%8F%E8%AE%AE%E7%9A%84%E8%AE%A4%E8%AF%86/)
+
+我们之前的示例，其实就是使用的DASH协议进行的点播服务。还记得当初使用`mp4box`生成的`demo_dash.mpd`文件吗？`mpd`(Media Presentation Description)文件就存储了fmp4文件的各种信息，包括视频大小，分辨率，分段视频的码率。。。
+
+HLS协议的`m3u8`索引文件就类似DASH的`mpd`描述文件
+
+| 协议 | 索引文件 | 传输格式 |
+| ---- | -------- | -------- |
+| DASH | mpd      | m4s  |
+| HLS  | m3u8     | ts       |
 
 
 ### 参考
@@ -331,3 +329,4 @@ const demo = new Demo()
 * [Building a simple MPEG-DASH streaming player](https://msdn.microsoft.com/zh-cn/library/windows/apps/dn551368.aspx)
 * [前端视频直播技术总结及video.js在h5页面中的应用](https://www.cnblogs.com/dreamsqin/p/12557070.html)
 * [流媒体协议的认识](https://www.xiaotaotao.vip/2019/11/28/%E6%B5%81%E5%AA%92%E4%BD%93%E5%8D%8F%E8%AE%AE%E7%9A%84%E8%AE%A4%E8%AF%86/)
+* [让html5视频支持分段渐进式下载的播放](https://blog.csdn.net/charleslei/article/details/50964176)
