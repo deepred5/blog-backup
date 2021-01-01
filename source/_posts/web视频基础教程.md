@@ -312,6 +312,13 @@ class Demo {
 
 const demo = new Demo()
 ```
+
+当然我们还有很多问题需要考虑，例如:
+1. 每次请求分段数据时，如何更新`Range`的请求范围
+2. 初次请求数据时，如何确保`video`有足够的数据能够播放视频
+3. 兼容性问题
+4. 更多细节。。。。
+
 更详细的分段加载过程，见[完整代码](https://github.com/deepred5/media-source-demo)
 
 
