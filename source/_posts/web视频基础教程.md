@@ -301,7 +301,7 @@ const isTimeEnough = () => {
 3. 兼容性问题
 4. 更多细节。。。。
 
-详细分段下载过程，见[完整代码](https://github.com/deepred5/media-source-demo)
+详细分段下载过程，见[完整代码](https://github.com/deepred5/media-source-demo/blob/master/demo.js)
 
 ### 流媒体协议
 视频服务一般分为：
@@ -311,6 +311,8 @@ const isTimeEnough = () => {
 不同的服务，选择的流媒体协议也各不相同。主流的协议有: RTMP、HTTP-FLV、HLS、DASH、webRTC等等，详见[《流媒体协议的认识》](https://www.xiaotaotao.vip/2019/11/28/%E6%B5%81%E5%AA%92%E4%BD%93%E5%8D%8F%E8%AE%AE%E7%9A%84%E8%AE%A4%E8%AF%86/)
 
 我们之前的示例，其实就是使用的DASH协议进行的点播服务。还记得当初使用`mp4box`生成的`demo_dash.mpd`文件吗？`mpd`(Media Presentation Description)文件就存储了fmp4文件的各种信息，包括视频大小，分辨率，分段视频的码率。。。
+
+哔哩哔哩网站就是采用的DASH协议
 
 HLS协议的`m3u8`索引文件就类似DASH的`mpd`描述文件
 
