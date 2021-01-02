@@ -183,7 +183,7 @@ http-server -p 4444 -c-1
 
 答案当然是肯定的，但是我们不能直接使用`video`加载原始分片数据，而是要通过 [MediaSource](https://developer.mozilla.org/en-US/docs/Web/API/MediaSource) API
 
-需要注意的是，普通的mp4格式文件，是无法通过`MediaSource`进行加载的，需要我们使用一些转码工具，将普通的mp4转换成fmp4([Fragmented MP4](https://stackoverflow.com/questions/35177797/what-exactly-is-fragmented-mp4fmp4-how-is-it-different-from-normal-mp4/35180327#35180327))。为了简单演示，我们这里不使用实时转码，而是直接通过[MP4Box](https://www.videohelp.com/software/MP4Box)工具，直接将一个完整的mp4转换成fmp4
+需要注意的是，**普通的mp4格式文件，是无法通过`MediaSource`进行加载的**，需要我们使用一些转码工具，将普通的mp4转换成fmp4([Fragmented MP4](https://stackoverflow.com/questions/35177797/what-exactly-is-fragmented-mp4fmp4-how-is-it-different-from-normal-mp4/35180327#35180327))。为了简单演示，我们这里不使用实时转码，而是直接通过[MP4Box](https://www.videohelp.com/software/MP4Box)工具，直接将一个完整的mp4转换成fmp4
 
 ```bash
 #### 每4s分割1段
