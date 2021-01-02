@@ -321,6 +321,12 @@ HLS协议的`m3u8`索引文件就类似DASH的`mpd`描述文件
 | DASH | mpd      | m4s  |
 | HLS  | m3u8     | ts       |
 
+### 开源库
+我们之前使用原生`Media Source`手写的加载过程，其实市面上已经有了成熟的开源库可以拿来即用，例如:[http-streaming](https://github.com/videojs/http-streaming)，[hls.js](https://github.com/video-dev/hls.js/)，[flv.js](https://github.com/Bilibili/flv.js/)。同时搭配一些解码转码库，也可以很方便的在浏览器端进行文件的实时转码，例如[mp4box.js](https://github.com/gpac/mp4box.js)，[ffmpeg.js](https://github.com/Kagami/ffmpeg.js/)
+
+### 总结
+本文简单介绍了 `Media Source Extensions` 实现视频渐进式播放的原理，涉及到基础的点播直播相关知识。由于音视频技术涉及的内容很多，加上本人~~水平的限制~~，所以只能帮助大家初步入个门而已
+
 
 ### 参考
 * [为什么视频网站的视频链接地址是blob？](https://juejin.cn/post/6844903880774385671)
