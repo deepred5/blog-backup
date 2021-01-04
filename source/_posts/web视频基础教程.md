@@ -312,7 +312,7 @@ const isTimeEnough = () => {
 
 我们之前的示例，其实就是使用的DASH协议进行的点播服务。还记得当初使用`mp4box`生成的`demo_dash.mpd`文件吗？`mpd`(Media Presentation Description)文件就存储了fmp4文件的各种信息，包括视频大小，分辨率，分段视频的码率。。。
 
-B站的点播就是采用的DASH协议
+B站的点播就是采用的DASH协议(m4s配合206状态码)
 ![bi2](http://pic.deepred5.com/bi2.png)
 
 HLS协议的`m3u8`索引文件就类似DASH的`mpd`描述文件
