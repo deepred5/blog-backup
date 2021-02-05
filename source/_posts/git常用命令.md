@@ -129,3 +129,14 @@ git pull upstream
 * `git push`之前，先`git pull`一下，保证提交前是最新代码
 * `git checkout -b 1.0.0 upstream/1.0.0`创建分支并关联远程分支，如果有问题，可以先`git fetch`下
 * 如果提交了一个merge request，然后又发现还需要改代码，只要这个merge request没有被accept，就可以继续在本地修改，然后`git push origin`即可，该merge request会包括你新提交的内容
+
+
+## Git多账户共存
+
+参考[同一台电脑上个人的github账户如何与公司的gitlab账户共存](https://www.cnblogs.com/hezhi/p/10317642.html)
+
+同时设置一个alias解决多账户不同用户名的问题(全局git用户名是公司账号用户名，可能是真名)
+```bash
+# 设置当前项目的git用户名为私人昵称deepred5
+gitlocal=git config --local user.name "deepred5"
+```
