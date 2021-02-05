@@ -15,7 +15,7 @@ tags: [windows]
 ### 快速启动
 下载后，直接解压，运行Cmder.exe即可启动
 
-如果想快速启动，可以把Cmder.exe所在的根目录((比如`D:\cmder`))添加到环境变量path中,之后win+r,输入cmder即可快速启动
+如果想快速启动，可以把Cmder.exe所在的根目录(比如`D:\cmder`)添加到环境变量path中,之后win+r,输入cmder即可快速启动
 
 ### 右键cmder打开
 
