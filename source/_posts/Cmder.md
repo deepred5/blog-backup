@@ -137,3 +137,4 @@ start %USERPROFILE%\AppData\Local\Microsoft\WindowsApps\wt.exe
 1. [Windows Terminal + Cmder = ❤️](https://medium.com/talpor/windows-terminal-cmder-%EF%B8%8F-573e6890d143)
 2. [Using Cmder in Windows Terminal](https://stackoverflow.com/questions/60575401/using-cmder-in-windows-terminal)
 3. [Windows Terminal管理员模式](https://www.zhihu.com/question/353701331/answer/1338291321)
+4. [windows下Powershell支持Git](https://blog.csdn.net/u014756245/article/details/100541329)
