@@ -133,7 +133,16 @@ git pull upstream
 
 ## Git多账户共存
 
-参考[同一台电脑上个人的github账户如何与公司的gitlab账户共存](https://www.cnblogs.com/hezhi/p/10317642.html)
+参考
+
+[同一台电脑上个人的github账户如何与公司的gitlab账户共存](https://www.cnblogs.com/hezhi/p/10317642.html)
+[Git 提示 Permission denied (publickey)，如何才能解决？](https://zhuanlan.zhihu.com/p/281094708)
+
+注意要把自定义名的key添加ssh配置里
+```bash
+ssh-add -K ~/.ssh/id_rsa
+ssh-add -K ~/.ssh/github_rsa
+```
 
 同时设置一个alias解决多账户不同用户名的问题(全局git用户名是公司账号用户名，可能是真名)
 ```bash
