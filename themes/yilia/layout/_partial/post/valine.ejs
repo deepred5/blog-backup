@@ -49,11 +49,15 @@
             const email = document.querySelector('input[type=email]');
             const nick = document.querySelector('input[name=nick]');
             const reg = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/; // 邮箱正则
-            if (email && (!email.value || !nick.value || !reg.test(email.value))) {
-                const str = `<div class="valert txt-center"><div class="vtext">请填写正确的昵称和邮箱！</div></div>`;
-                const vmark = document.querySelector('.vmark');
+            if (!nick.value) {
+                const str = `<div class="valert txt-center"><div class="vtext">请填写正确的昵称！</div></div>`;
+                const vmark = document.createElement('div');
                 vmark.innerHTML = str;
                 vmark.style.display = 'block';
+                const vpanel = document.querySelector('.vpanel');
+                if (vpanel) {
+                    vpanel.appendChild(vmark);
+                }
 
                 // 阻止捕获传递下去，否则仍然可以提交评论!!!
                 e.stopPropagation();
