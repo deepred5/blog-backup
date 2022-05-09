@@ -6,6 +6,9 @@
   position: relative;
   background: #fff;
   -webkit-transition: all 0.2s ease-in;
+  summary {
+    cursor: pointer;
+  }
   &.show{
     visibility: visible;
     -webkit-animation: cd-bounce-1 0.6s;
