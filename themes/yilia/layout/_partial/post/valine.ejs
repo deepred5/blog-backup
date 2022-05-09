@@ -1,8 +1,24 @@
 <div id="comment"></div>
 <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
 <style>
+    .valert-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 5rem;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .vpanel {
+        position: relative;
+    }
+
     .vtext {
-        color: red !important;
+        color: #fff !important;
     }
 
     .vcards {
@@ -52,20 +68,20 @@
             if (!nick.value) {
                 const str = `<div class="valert txt-center"><div class="vtext">请填写正确的昵称！</div></div>`;
                 const vmark = document.createElement('div');
+                vmark.classList.add('valert-container');
                 vmark.innerHTML = str;
-                vmark.style.display = 'block';
                 const vpanel = document.querySelector('.vpanel');
                 if (vpanel) {
                     vpanel.appendChild(vmark);
+                    e.target.disabled = true;
+                    setTimeout(function () {
+                        vpanel.removeChild(vmark);
+                        e.target.disabled = false;
+                    }, 2500);
                 }
 
                 // 阻止捕获传递下去，否则仍然可以提交评论!!!
                 e.stopPropagation();
-
-                setTimeout(function () {
-                    vmark.style.display = 'none';
-                    vmark.innerHTML = '';
-                }, 2500);
             } else {
                 // 使用server酱通知
                 const href = window.location.href;
