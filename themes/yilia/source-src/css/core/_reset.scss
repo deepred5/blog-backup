@@ -46,8 +46,7 @@ hgroup,
 main,
 menu,
 nav,
-section,
-summary {
+section {
     display: block;
 }
 
@@ -415,4 +414,9 @@ i {
 // 清除子元素浮动
 .clearfix {
     @extend %clearfix;
+}
+
+summary {
+    font-weight: bold;
+    cursor: pointer;
 }
