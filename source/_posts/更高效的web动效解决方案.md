@@ -185,10 +185,6 @@ https://www.live2d.com/en/
 使用[Oasis](https://oasisengine.cn/)、[Cocos](https://www.cocos.com/)、 [Unity](https://unity.com/cn)等更专业的游戏引擎，为我们提供更真实物理的现实效果。
 
 
-
-
-
-
 ### 参考
 
 * [夏日花火，谈谈移动端背景视频实现](https://juejin.cn/post/6865260341115224071)
