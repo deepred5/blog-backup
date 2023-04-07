@@ -182,7 +182,7 @@ https://www.live2d.com/en/
 
 ### 游戏引擎
 
-使用[Oasis](https://oasisengine.cn/)、[Cocos](https://www.cocos.com/)、 [Unity](https://unity.com/cn)等更专业的游戏引擎，为我们提供更真实物理的现实效果。
+使用[Oasis](https://oasisengine.cn/)、[Cocos](https://www.cocos.com/)、 [Unity](https://unity.com/cn)等更专业的游戏引擎，为我们提供更真实的物理效果。
 
 
 ### 参考
