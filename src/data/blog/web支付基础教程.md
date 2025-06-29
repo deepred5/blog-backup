@@ -229,7 +229,7 @@ ajax({
 
 [支付宝H5开放文档](https://myjsapi.alipay.com/jsapi/index.html)
 
-关于`jsbridge`的知识，可以查看我之前的文章[jsbridge初探](http://anata.me/2020/03/04/jsbridge%E5%88%9D%E6%8E%A2/)
+关于`jsbridge`的知识，可以查看我之前的文章[jsbridge初探](/posts/jsbridge初探/)
 
 `JSAPI`的简单示例
 ```javascript
