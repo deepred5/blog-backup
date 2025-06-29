@@ -507,7 +507,7 @@ monitor.init('6666');
 </srcipt>
 ```
 
-原理其实也很简单，你可以看下打包后的源码，或者看我之前写过的一篇[文章](http://anata.me/2018/01/25/%E5%85%BC%E5%AE%B9AMD-CMD-CommonJS-%E5%8E%9F%E7%94%9F%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E5%B0%81%E8%A3%85%E5%86%99%E6%B3%95/)
+原理其实也很简单，你可以看下打包后的源码，或者看我之前写过的一篇[文章](/posts/兼容amd-cmd-commonjs-原生浏览器的封装写法)
 
 ## 总结
 rollup通常适用于打包JS类库，通过rollup打包后的代码，体积较小，而且没有冗余的代码。rollup默认只支持ES6的模块化，如果需要支持Commonjs，还需下载相应的插件[rollup-plugin-commonjs](https://github.com/rollup/rollup-plugin-commonjs)

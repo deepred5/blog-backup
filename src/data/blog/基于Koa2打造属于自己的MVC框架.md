@@ -157,7 +157,7 @@ module.exports = Home
 ```
 至此，一个最简单的`MVC` web流程已经跑通
 
-<font color="orange">在开始教程之前，最好希望你有`Koa`源码的阅读经验，可以参考我之前的文章：[Koa源码浅析](http://anata.me/2019/06/24/Koa%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90/)</font>
+<font color="orange">在开始教程之前，最好希望你有`Koa`源码的阅读经验，可以参考我之前的文章：[Koa源码浅析](/posts/Koa源码浅析)</font>
 
 接下来，我们会一步步实现`my-node-mvc`这个框架
 

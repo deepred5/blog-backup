@@ -53,7 +53,7 @@ const user = new User('deepred');
 user.setState({ name: 'hentai' });
 ```
 
-首先，你需要知道JavaScript的面向对象基础知识，如果还不是很了解，可以先看下这篇文章[JavaScript的面向对象](http://anata.me/2018/03/26/JavaScript%E7%9A%84%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/)
+首先，你需要知道JavaScript的面向对象基础知识，如果还不是很了解，可以先看下这篇文章[JavaScript的面向对象](/posts/JavaScript的面向对象)
 
 
 ### setState的实现

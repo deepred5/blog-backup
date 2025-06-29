@@ -9,7 +9,7 @@ tags:
 
 更新：2019/07/28
 
-[从零开始搭建一个简单的基于webpack的react开发环境](http://anata.me/2019/06/04/%E5%82%BB%E5%82%BB%E5%88%86%E4%B8%8D%E6%B8%85%E7%9A%84Manifest/#%E5%9F%BA%E4%BA%8Ewebpack%E7%9A%84react%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83)
+[从零开始搭建一个简单的基于webpack的react开发环境](/posts/傻傻分不清的manifest#基于webpack的react开发环境)
 
 原文:
 

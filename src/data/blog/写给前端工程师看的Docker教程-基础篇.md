@@ -352,7 +352,7 @@ get name
 ```
 
 ### 总结
-我们主要学习了Docker里镜像和容器的基本概念，掌握了端口映射(-p)和目录映射(-v)的用法，同时学习了如何在Docker里使用Nginx和Redis。在[下一篇文章](http://anata.me/2019/09/30/%E5%86%99%E7%BB%99%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%9C%8B%E7%9A%84Docker%E6%95%99%E7%A8%8B-%E5%AE%9E%E6%88%98%E7%AF%87/)里，会继续介绍Docker实战
+我们主要学习了Docker里镜像和容器的基本概念，掌握了端口映射(-p)和目录映射(-v)的用法，同时学习了如何在Docker里使用Nginx和Redis。在[下一篇文章](/posts/写给前端工程师看的Docker教程-实战篇)里，会继续介绍Docker实战
 
 ### 参考
 * [只要一小时，零基础入门Docker](https://zhuanlan.zhihu.com/p/23599229)

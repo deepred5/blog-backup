@@ -123,7 +123,7 @@ HTML5规范也废弃了这个属性，因此不建议使用
 #### 基于webpack的react开发环境
 本文默认你已经了解最基本的webpack配置，如果完全不会，建议看下这篇
 
-[基础知识](http://anata.me/2018/01/08/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E5%9F%BA%E4%BA%8Ewebpack%E7%9A%84vue%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/)
+[基础知识](/posts/从零开始搭建一个简单的基于webpack的vue开发环境)
 
 我们首先搭建一个最简单的基于webpack的react开发环境
 

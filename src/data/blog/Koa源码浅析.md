@@ -481,7 +481,7 @@ function compose(funcs) {
 Koa的中间件机制类似上面的`compose`，同样是把多个函数包装成一个，但是koa的中间件类似洋葱模型，也就是从A中间件执行到B中间件，B中间件执行完成以后，仍然可以再次回到A中间件。
 ![onion](@/assets/images/Koa源码浅析/onion.png)
 
-Koa使用了`koa-compose`实现了中间件机制，源码非常精简，但是有点难懂。建议先了解下[递归](http://anata.me/2018/07/30/%E7%AE%80%E5%8D%95%E6%98%93%E6%87%82%E7%9A%84%E7%8E%B0%E4%BB%A3%E9%AD%94%E6%B3%95-%E9%80%92%E5%BD%92/)
+Koa使用了`koa-compose`实现了中间件机制，源码非常精简，但是有点难懂。建议先了解下[递归](/posts/简单易懂的现代魔法-递归)
 ```javascript
 
 function compose (middleware) {
