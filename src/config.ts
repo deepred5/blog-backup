@@ -1,5 +1,5 @@
 export const SITE = {
-  website: "https://blog.fanfans.live/", // replace this with your deployed domain
+  website: "https://deep5.red/", // replace this with your deployed domain
   author: "deepred5",
   profile: "https://github.com/deepred5",
   desc: "深红结界,DeepRed5的个人博客,分享前端技术、编程语言、软件开发等相关内容。",
