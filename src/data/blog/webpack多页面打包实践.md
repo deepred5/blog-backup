@@ -8,8 +8,8 @@ description: webpack多页面打包实践
 前不久从零开始写了一个webpack多页面打包boilerplate([webpack4-boilerplate](https://github.com/deepred5/webpack4-boilerplate))，方便以后工作可以开箱即用，特此记录下开发过程中的要点。
 
 注意：本文不会详细介绍webpack的基础知识，如果完全不会，建议看下我之前写过的基础文章
-* [从零开始搭建一个简单的基于webpack的vue开发环境](http://anata.me/2018/01/08/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E5%9F%BA%E4%BA%8Ewebpack%E7%9A%84vue%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/)
-* [从零开始搭建一个简单的基于webpack的react开发环境](http://anata.me/2019/06/04/%E5%82%BB%E5%82%BB%E5%88%86%E4%B8%8D%E6%B8%85%E7%9A%84Manifest/#%E5%9F%BA%E4%BA%8Ewebpack%E7%9A%84react%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83)
+* [从零开始搭建一个简单的基于webpack的vue开发环境](/posts/从零开始搭建一个简单的基于webpack的vue开发环境/)
+* [从零开始搭建一个简单的基于webpack的react开发环境](/posts/傻傻分不清的manifest#基于webpack的react开发环境)
 
 ### 多页打包的原因
 首先发出一个直击灵魂的拷问：为什么要多页面打包？
@@ -191,7 +191,7 @@ build
 * `dev`配置`devServer`，方便本地调试开发
 * `prod`打包压缩文件，单独提取css (dev不提取是为了css热更新)，生成静态资源清单`manifest.json`
 
-关于为什么要生成一份`manifest.json`，以及打包后的代码如何部署，我将会在[下一篇文章](http://anata.me/2020/02/29/%E5%86%8D%E8%B0%88%E5%89%8D%E5%90%8E%E7%AB%AF%E5%88%86%E7%A6%BB%E5%BC%80%E5%8F%91%E5%92%8C%E9%83%A8%E7%BD%B2/)详细介绍。
+关于为什么要生成一份`manifest.json`，以及打包后的代码如何部署，我将会在[下一篇文章](/posts/再谈前后端分离开发和部署/)详细介绍。
 
 ### 总结
 webpack的学习始终是前端绕不过去的一道坎。通过这次从零搭建多页面打包模板，也算是巩固了一下基础知识，离~~webpack配置工程师~~又近了一步。

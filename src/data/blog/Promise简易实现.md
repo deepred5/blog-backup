@@ -5,7 +5,7 @@ tags:
   - JavaScript
 description: Promise简易实现
 ---
-在[《Promise必知必会》](http://anata.me/2018/08/08/Promise%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A/)一文里，我介绍了`Promise`的基础知识和常用方法。虽然在日常开发中，这些内容已经满足二八定律，然而在面试中，<font color="#6495ed">`写手实现一个Promise`</font>的问题，依旧出现在考官的高频题库里。
+在[《Promise必知必会》](/posts/promise必知必会/)一文里，我介绍了`Promise`的基础知识和常用方法。虽然在日常开发中，这些内容已经满足二八定律，然而在面试中，<font color="#6495ed">`写手实现一个Promise`</font>的问题，依旧出现在考官的高频题库里。
 
 > 那些口口声声 “老子学不动”的人
 应该看着你们
