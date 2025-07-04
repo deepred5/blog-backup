@@ -3,7 +3,6 @@
 [deep5.red](https://deep5.red/)
 
 ### 开发
-
 ```
 # 安装依赖
 pnpm i
