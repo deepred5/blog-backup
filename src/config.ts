@@ -22,4 +22,6 @@ export const SITE = {
   timezone: "Asia/Shanghai", // Default global timezone (IANA format) https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   // Google Analytics 4 Measurement ID. Leave empty string to disable.
   googleAnalyticsId: "G-C4LSR8HGQY",
+  // Microsoft Clarity Project ID. Leave empty string to disable.
+  clarityId: "stip5z6y43",
 } as const;
