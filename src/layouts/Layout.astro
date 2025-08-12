@@ -130,6 +130,32 @@ const structuredData = {
 
     <ClientRouter />
 
+    {SITE.googleAnalyticsId && (
+      <>
+        <!-- Google tag (gtag.js) -->
+        <script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${SITE.googleAnalyticsId}`}
+        ></script>
+        <script
+          is:inline
+          set:html={`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(...args){ dataLayer.push(args); }
+            gtag('js', new Date());
+            gtag('config', '${SITE.googleAnalyticsId}');
+            document.addEventListener('astro:page-load', () => {
+              if (window.gtag) {
+                window.gtag('config', '${SITE.googleAnalyticsId}', {
+                  page_path: location.pathname + location.search + location.hash,
+                });
+              }
+            });
+          `}
+        ></script>
+      </>
+    )}
+
     <script is:inline src="/toggle-theme.js"></script>
   </head>
   <body>
