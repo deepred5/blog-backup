@@ -3,6 +3,10 @@
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+:root {
+  text-autospace: normal; 
+}
+
 :root,
 html[data-theme="light"] {
   --background: #fdfdfd;

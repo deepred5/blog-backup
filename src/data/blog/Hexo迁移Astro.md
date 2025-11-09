@@ -21,11 +21,11 @@ featured: true
 
 > 根据《互联网域名管理办法》要求，阿里云计算有限公司、阿里巴巴云计算（北京）有限公司停止为尚未取得域名注册管理机构许可的顶级域名提供服务。阿里云中国站将自2021年7月20日起开始对存量未取得域名注册管理机构许可的顶级域名进行清理，您的以下域名未在此时间点前申请转出至海外注册商。
 
-然而我也没注册过阿里云国际站，现在既登不进国际站，也无法在中国站续费。于是只能含泪现注册了一个新域名: `deep5.red`
+然而我也没注册过阿里云国际站()，现在既登不进国际站，也无法在中国站续费。于是只能含泪现注册了一个新域名: `deep5.red`
 
 当然也就顺理成章的从阿里云跑路到了赛博佛祖: [**Cloudflare**](https://www.cloudflare.com/zh-cn/)
 
-**后续 2025-06-29: 通过阿里云海外站工单反馈， 找回之前的域名了! 🌸✨🎉✨🌸**
+**后续 2025-06-29: 通过谷歌邮箱注册阿里云海外站后，提交工单反馈，找回之前的域名了! 🌸✨🎉✨🌸**
 
 ## Astro 迁移
 
@@ -37,6 +37,7 @@ featured: true
 
 * [动态 OG 图片支持中文](https://github.com/deepred5/blog-backup/blob/main/src/utils/og-templates/post.js#L162)
 * [中文目录支持](https://github.com/deepred5/blog-backup/blob/main/astro.config.ts#L23)
+* [语言本地化](https://github.com/deepred5/blog-backup/commit/ab16f9a9586f09e0f68210ccc0964dd788a73d82)
 
 博客内容，由于都是由 `Markdown` 文件存储，所以迁移过来比较方便，直接无脑拷贝过来即可: 只需要修改`Frontmatter`的属性，以兼容 `astro-paper` [要求](https://astro-paper.pages.dev/posts/adding-new-posts-in-astropaper-theme/#frontmatter)即可
 
