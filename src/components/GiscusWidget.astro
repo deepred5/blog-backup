@@ -1,0 +1,50 @@
+
+<div data-giscus-container></div>
+<script
+  is:inline
+  data-astro-rerun
+  set:html={`(function () {
+    const ATTRIBUTES = {
+      src: "https://giscus.app/client.js",
+      "data-repo": "deepred5/blog-backup",
+      "data-repo-id": "MDEwOlJlcG9zaXRvcnkxMDc3NDIzMzY=",
+      "data-category": "Announcements",
+      "data-category-id": "DIC_kwDOBmwEgM4CxmZE",
+      "data-mapping": "title",
+      "data-strict": "0",
+      "data-reactions-enabled": "1",
+      "data-emit-metadata": "0",
+      "data-input-position": "top",
+      "data-lang": "zh-CN",
+      "data-loading": "lazy",
+      crossorigin: "anonymous",
+      async: "true"
+    };
+
+    const getTheme = () => {
+      const theme = document.documentElement.getAttribute("data-theme");
+      return theme === "dark" ? "dark" : "light";
+    };
+
+    const scriptElement = document.currentScript;
+    const container = scriptElement?.previousElementSibling;
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const script = document.createElement("script");
+    Object.entries(ATTRIBUTES).forEach(([key, value]) => {
+      if (value === "true") {
+        script.setAttribute(key, "");
+      } else {
+        script.setAttribute(key, value);
+      }
+    });
+
+    script.setAttribute("data-theme", getTheme());
+
+    container.appendChild(script);
+  })();`}
+></script>
+<script src="/giscus-theme.js" data-astro-rerun></script>
+
