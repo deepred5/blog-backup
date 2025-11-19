@@ -466,7 +466,7 @@ Component({
 
 #### 人脸识别
 
-源码示例: [人脸脸识别](https://github.com/deepred5/xr-frame-tutorial/tree/main/components/demo2/index.wxml)
+源码示例: [人脸识别](https://github.com/deepred5/xr-frame-tutorial/tree/main/components/demo2/index.wxml)
 
 ```xml file="components/demo2/index.wxml"
 <!-- AR system 系统开启 Face 模式 同时开启前置摄像头 -->
