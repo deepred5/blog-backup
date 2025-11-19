@@ -36,7 +36,7 @@ description: 小程序 XR-FRAME 基础教程
 
 官方同时提供了大量[创意模版](https://cloud.kivicube.com/templates)供大家一键使用
 
-<video style="width:40%;margin: 0 auto;" controls src="https://kivicube-resource.kivisense.com/scene-templates/video/F54453chZCcFM4hPxlCKq7FAnY86C36D.mp4"></video>
+<video style="width:40%;margin: 0 auto;" controls src="https://webstatic.deep5.red/202511119-kivicube-ar.mp4"></video>
 
 ## 技术方案
 
