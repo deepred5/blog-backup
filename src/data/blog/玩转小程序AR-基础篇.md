@@ -10,21 +10,27 @@ tags:
 description: 小程序 XR-FRAME 基础教程
 ---
 
+《玩转小程序AR》系列教程
+
+* [**玩转小程序AR-基础篇**](/posts/玩转小程序ar-基础篇)
+* [玩转小程序AR-实战篇](/posts/玩转小程序ar-实战篇)
+
+
 ## 目录
 
 ## 背景
 
 某天需求方扔了个链接：[【原神官方】AR 立牌](https://detail.tmall.com/item.htm?fpChannel=101&fpChannelSig=5e762bf5403ecf3effc7b043733500dd040c9068&id=823870055035&sku_properties=134942334%3A33623926433&u_channel=bybtqdyh&umpChannel=bybtqdyh)，询问**小程序**是否能够实现类似的**AR**效果。
 
-预感`AR`会有很多坑的我，刚想~~婉拒~~，无奈被老大以**技术调研**为由，把项目接手下来。于是被迫补起：早已过了风口(bushi)的`AR`知识。
+预感`AR`开发会有很多坑的我，刚想~~婉拒~~，无奈被老大以**技术调研**为由，把项目接手下来。于是被迫补起：早已过了风口(~~bushi~~)的`AR`知识。
 
 ## 调研
 
 ### 实体 AR 立牌
 
-斥~巨资~在闲鱼淘了个多莉的角色立牌，实际体验了下完整的交互流程，AR氛围感还是不错的。
+斥**巨资**在闲鱼淘了个多莉的角色立牌，实际体验了下完整的交互流程，AR的氛围感还是不错的。
 
-<video style="width:40%" controls src="https://webstatic.deep5.red/20251110-202934-ar.mp4"></video>
+<video style="width:40%" controls src="https://webstatic.deep5.red/ar/20251110-202934-ar.mp4"></video>
 
 ### AR在线制作平台
 
@@ -36,7 +42,7 @@ description: 小程序 XR-FRAME 基础教程
 
 官方同时提供了大量[创意模版](https://cloud.kivicube.com/templates)供大家一键使用
 
-<video style="width:40%;margin: 0 auto;" controls src="https://webstatic.deep5.red/202511119-kivicube-ar.mp4"></video>
+<video style="width:40%;margin: 0 auto;" controls src="https://webstatic.deep5.red/ar/202511119-kivicube-ar.mp4"></video>
 
 ## 技术方案
 
@@ -322,7 +328,7 @@ AR 能力，需要调用摄像头权限
 ![真机预览模式](@/assets/images/玩转小程序AR/9.png)
 
 #### Plane 识别
-<video style="width:40%" controls src="https://webstatic.deep5.red/202511119-plane-ar.mp4"></video>
+<video style="width:40%" controls src="https://webstatic.deep5.red/ar/202511119-plane-ar.mp4"></video>
 
 源码示例: [Plane 模式](https://github.com/deepred5/xr-frame-tutorial/tree/main/components/demo3/index.wxml)
 
@@ -385,7 +391,7 @@ Component({
 
 #### Marker 识别
 
-<video style="width:40%;" controls src="https://webstatic.deep5.red/202511119-marker-ar.mp4"></video>
+<video style="width:40%;" controls src="https://webstatic.deep5.red/ar/202511119-marker-ar.mp4"></video>
 
 源码示例: [Marker 模式](https://github.com/deepred5/xr-frame-tutorial/tree/main/components/demo4/index.wxml)
 
@@ -438,7 +444,7 @@ Component({
 
 #### OSD 识别
 
-<video style="width:40%;" controls src="https://webstatic.deep5.red/202511119-osd-ar.mp4"></video>
+<video style="width:40%;" controls src="https://webstatic.deep5.red/ar/202511119-osd-ar.mp4"></video>
 
 源码示例: [OSD 模式](https://github.com/deepred5/xr-frame-tutorial/tree/main/components/demo5/index.wxml)
 
@@ -493,7 +499,7 @@ Component({
 
 到这里，我们已经把 XR-FRAME 的基础能力都过了一遍：从创建场景、添加物体、设置光照，到加载模型和动画，再到四种 AR 识别模式（Plane、Marker、OSD、Face）。理论上，你已经可以做出一个简单的 AR 效果了。
 
-但理论和实际总是有差距的。在下一篇**实战篇**中，我会分享更高阶的知识点和实际项目中的经验：
+但理论和实际总是有差距的。在下一篇[**实战篇**](/posts/玩转小程序ar-实战篇)中，我会分享更高阶的知识点和实际项目中的经验：
 
 * **Shader 着色器**：实现自定义视觉效果，让 AR 场景更炫酷
 * **同层渲染**：XR 组件和小程序原生组件互相通信，实现复杂的 UI 交互
