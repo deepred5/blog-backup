@@ -14,16 +14,18 @@ description: 小程序 XR-FRAME 实战教程
 * [玩转小程序AR-基础篇](/posts/玩转小程序ar-基础篇)
 * [**玩转小程序AR-实战篇**](/posts/玩转小程序ar-实战篇)
 
+**声明：**  
+**本文所载内容仅限于学习交流之目的。所有抓包内容、敏感网址及数据接口均已进行脱敏处理，严禁将其用于商业或非法用途。任何因此产生的后果，作者不承担任何责任。若涉及侵权，请及时联系作者以便立即删除。**
 
 ## 目录
 
 ## 逆向小程序
 
-接着[前文](/posts/玩转小程序ar-基础篇#实体-ar-立牌)，体验过原神官方AR小程序后，我也比较好奇他们实现AR Live2d 动画的原理。
+接着前文[《玩转小程序AR-基础篇》](/posts/玩转小程序ar-基础篇#实体-ar-立牌)，体验过原神官方AR小程序后，我也比较好奇他们实现AR Live2d 动画的原理。
 
 <video style="width:40%" controls src="https://webstatic.deep5.red/ar/20251110-202934-ar.mp4"></video>
 
-出于**技术学习**的目的，我在开源社区搜寻小程序反编译工具，发现 [KillWxapkg](https://github.com/Ackites/KillWxapkg) 和  [unveilr](https://github.com/broken5/unveilr) 暂时仍可使用
+出于**技术学习**的目的，在开源社区搜寻微信小程序反编译工具，发现 [KillWxapkg](https://github.com/Ackites/KillWxapkg) 和  [unveilr](https://github.com/broken5/unveilr) 暂时仍可使用
 
 ### 逆向 原神AR 小程序
 
