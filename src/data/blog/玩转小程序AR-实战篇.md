@@ -502,7 +502,7 @@ XR-FRAME组件需要将AR的识别状态同步给父级，父级根据不同的A
 
 ## 框架维护
 
-比较尴尬的是，[核心技术负责人](https://dtysky.moe/article/Art-%E5%8E%8C%E5%80%A62024)已离开团队，框架处于**暂停维护**状态
+比较尴尬的是，[核心技术负责人](https://dtysky.moe/article/Art-%E5%8E%8C%E5%80%A62024)已离开团队，XR-FRAME 框架处于**暂停维护**状态
 
 ![暂停维护](@/assets/images/玩转小程序AR/screenshot-20251201-214919.png)
 
