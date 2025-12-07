@@ -468,7 +468,7 @@ Component({
 
 <video style="width:40%;" controls src="https://webstatic.deep5.red/ar/work.mp4"></video>
 
-源码示例: [序列帧 SHADER](https://github.com/deepred5/xr-frame-tutorial/tree/main/pages/demo8)
+源码示例: [实战案例](https://github.com/deepred5/xr-frame-tutorial/tree/main/pages/demo8)
 
 ### 同层渲染
 
